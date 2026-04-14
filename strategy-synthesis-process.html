@@ -67,7 +67,7 @@
     border: 1.5px solid rgba(196,163,90,0.2);
     border-radius: 12px;
     padding: 20px 24px;
-    cursor: pointer;
+    cursor: default;
     transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
@@ -310,7 +310,7 @@
     <p>Strategy isn't about running frameworks in isolation. The real value emerges when outputs from one analysis become inputs for the next. This map traces how raw environmental and internal data is progressively synthesised into actionable strategic recommendations.</p>
   </div>
 
-  <div class="flow" id="flow">
+  <div class="flow" id="flow" onmouseleave="closeDetail()">
     <!-- Step line -->
     <div class="step-line"></div>
 
@@ -323,7 +323,7 @@
         <div class="stage-desc">Mapping the environment the organisation operates in</div>
       </div>
       <div class="stage-content">
-        <div class="framework-card theme-external" id="card-pestel" onclick="showDetail('pestel')">
+        <div class="framework-card theme-external" id="card-pestel" onmouseenter="showDetail('pestel')">
           <div class="card-header">
             <div class="card-icon" style="background:#5b8af5;">P</div>
             <div>
@@ -352,7 +352,7 @@
         <div class="stage-desc">Evaluating the organisation's own resources and capabilities</div>
       </div>
       <div class="stage-content">
-        <div class="framework-card theme-internal" id="card-vrio" onclick="showDetail('vrio')">
+        <div class="framework-card theme-internal" id="card-vrio" onmouseenter="showDetail('vrio')">
           <div class="card-header">
             <div class="card-icon" style="background:#42dba5;">V</div>
             <div>
@@ -412,7 +412,7 @@
         <div class="stage-desc">Combining external and internal findings into a unified picture</div>
       </div>
       <div class="stage-content">
-        <div class="framework-card theme-synthesis" id="card-swot" onclick="showDetail('swot')">
+        <div class="framework-card theme-synthesis" id="card-swot" onmouseenter="showDetail('swot')">
           <div class="card-header">
             <div class="card-icon" style="background:#f59b42;">S</div>
             <div>
@@ -477,7 +477,7 @@
         <div class="stage-desc">Systematically producing strategic options from the SWOT picture</div>
       </div>
       <div class="stage-content">
-        <div class="framework-card theme-generation" id="card-tows" onclick="showDetail('tows')">
+        <div class="framework-card theme-generation" id="card-tows" onmouseenter="showDetail('tows')">
           <div class="card-header">
             <div class="card-icon" style="background:#a66bf5;">T</div>
             <div>
@@ -548,7 +548,7 @@
         <div class="stage-desc">Evidence-based strategic recommendations with clear lineage</div>
       </div>
       <div class="stage-content">
-        <div class="framework-card theme-output" id="card-recs" onclick="showDetail('recs')">
+        <div class="framework-card theme-output" id="card-recs" onmouseenter="showDetail('recs')">
           <div class="card-header">
             <div class="card-icon" style="background:#e05555;">R</div>
             <div>
