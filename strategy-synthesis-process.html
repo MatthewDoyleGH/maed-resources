@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Strategy Synthesis Process</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Calibri', 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: #FFFFFF;
+    color: #2a2a2a;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  #header {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: linear-gradient(180deg, rgba(255,255,255,0.97) 0%, rgba(255,255,255,0.85) 80%, transparent 100%);
+    padding: 18px 30px 30px;
+    pointer-events: none;
+    display: flex; align-items: center; gap: 18px;
+  }
+  #header img { height: 40px; opacity: 0.95; }
+  #header .header-text { display: flex; flex-direction: column; }
+  #header .header-divider { width: 1px; height: 36px; background: #C4A35A; opacity: 0.5; flex-shrink: 0; }
+  #header h1 { font-family: 'Georgia', serif; font-size: 20px; font-weight: 700; color: #1a1a1a; letter-spacing: 0.3px; }
+  #header p { font-size: 12px; color: #666; margin-top: 3px; }
+
+  #main { padding: 90px 30px 40px; max-width: 1400px; margin: 0 auto; }
+
+  .intro {
+    text-align: center; margin-bottom: 40px; max-width: 720px; margin-left: auto; margin-right: auto;
+  }
+  .intro h2 {
+    font-family: 'Georgia', serif; font-size: 22px; color: #1a1a1a; margin-bottom: 8px;
+  }
+  .intro p { font-size: 14px; color: #666; line-height: 1.6; }
+
+  /* ── Flow container ── */
+  .flow { position: relative; }
+
+  /* ── Stage rows ── */
+  .stage-row {
+    display: flex; align-items: stretch; gap: 24px; margin-bottom: 0;
+    position: relative;
+  }
+
+  .stage-label {
+    width: 160px; flex-shrink: 0; padding: 20px 0;
+    display: flex; flex-direction: column; justify-content: center;
+  }
+  .stage-num {
+    font-size: 11px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 1.2px; margin-bottom: 4px;
+  }
+  .stage-name {
+    font-family: 'Georgia', serif; font-size: 17px; font-weight: 700; color: #1a1a1a;
+  }
+  .stage-desc { font-size: 11.5px; color: #888; margin-top: 4px; line-height: 1.4; }
+
+  .stage-content { flex: 1; padding: 16px 0; }
+
+  /* ── Cards ── */
+  .framework-card {
+    background: #fff;
+    border: 1.5px solid rgba(196,163,90,0.2);
+    border-radius: 12px;
+    padding: 20px 24px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  .framework-card:hover {
+    border-color: rgba(196,163,90,0.5);
+    box-shadow: 0 4px 24px rgba(196,163,90,0.12);
+    transform: translateY(-2px);
+  }
+  .framework-card.active {
+    border-color: rgba(196,163,90,0.7);
+    box-shadow: 0 6px 32px rgba(196,163,90,0.18);
+  }
+  .framework-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  }
+
+  .card-header { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+  .card-icon {
+    width: 40px; height: 40px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; font-weight: 700; color: #fff; flex-shrink: 0;
+  }
+  .card-title { font-size: 16px; font-weight: 700; color: #1a1a1a; }
+  .card-subtitle { font-size: 11px; color: #888; margin-top: 1px; }
+
+  .card-body { font-size: 13px; color: #555; line-height: 1.55; }
+
+  /* ── Data pills ── */
+  .data-pills { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+  .pill {
+    font-size: 11px; padding: 4px 10px; border-radius: 20px;
+    font-weight: 600; letter-spacing: 0.3px;
+    transition: all 0.3s;
+  }
+  .pill.highlight { transform: scale(1.08); box-shadow: 0 2px 8px rgba(0,0,0,0.12); }
+
+  /* ── Connector arrows ── */
+  .connector-zone {
+    display: flex; align-items: center; justify-content: center;
+    padding: 8px 0; position: relative;
+  }
+  .connector-zone .stage-label { visibility: hidden; }
+
+  .arrow-group {
+    flex: 1; display: flex; align-items: center; justify-content: center;
+    gap: 16px; position: relative; min-height: 60px;
+  }
+
+  .flow-arrow {
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    transition: all 0.3s;
+  }
+  .flow-arrow svg { transition: all 0.3s; }
+  .flow-arrow.active svg { filter: drop-shadow(0 2px 6px rgba(196,163,90,0.3)); }
+  .flow-arrow-label {
+    font-size: 10.5px; color: #999; font-weight: 600; text-align: center;
+    max-width: 180px; line-height: 1.3; letter-spacing: 0.3px;
+    text-transform: uppercase;
+  }
+  .flow-arrow.active .flow-arrow-label { color: #C4A35A; }
+
+  /* ── Source cards in a row ── */
+  .source-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+
+  /* ── Detail panel ── */
+  .detail-panel {
+    position: fixed; right: -440px; top: 0; bottom: 0; width: 420px;
+    background: rgba(255,255,255,0.98); border-left: 1px solid rgba(196,163,90,0.2);
+    z-index: 150; padding: 80px 28px 28px; overflow-y: auto;
+    transition: right 0.35s ease; backdrop-filter: blur(12px);
+    box-shadow: -4px 0 32px rgba(0,0,0,0.06);
+  }
+  .detail-panel.open { right: 0; }
+  .detail-close {
+    position: absolute; top: 24px; right: 20px;
+    width: 32px; height: 32px; border-radius: 8px;
+    border: 1px solid rgba(196,163,90,0.2); background: #fff;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    font-size: 18px; color: #999; transition: all 0.2s;
+  }
+  .detail-close:hover { background: rgba(196,163,90,0.1); color: #8a7230; }
+
+  .detail-badge {
+    display: inline-block; font-size: 10px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 1px;
+    padding: 3px 10px; border-radius: 4px; margin-bottom: 10px;
+  }
+  .detail-title {
+    font-family: 'Georgia', serif; font-size: 20px; font-weight: 700;
+    color: #1a1a1a; margin-bottom: 6px;
+  }
+  .detail-purpose { font-size: 13px; color: #666; line-height: 1.6; margin-bottom: 20px; }
+
+  .detail-section-title {
+    font-size: 10px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 1px; color: #C4A35A; margin-bottom: 8px; margin-top: 20px;
+  }
+
+  .output-item {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 8px 0; border-bottom: 1px solid rgba(0,0,0,0.04);
+  }
+  .output-dot {
+    width: 8px; height: 8px; border-radius: 50%; margin-top: 5px; flex-shrink: 0;
+  }
+  .output-text { font-size: 13px; color: #444; line-height: 1.5; }
+  .output-text strong { color: #1a1a1a; }
+
+  .synthesis-note {
+    background: rgba(196,163,90,0.06); border: 1px solid rgba(196,163,90,0.15);
+    border-radius: 8px; padding: 14px 16px; margin-top: 16px;
+  }
+  .synthesis-note p { font-size: 12.5px; color: #666; line-height: 1.55; }
+  .synthesis-note strong { color: #8a7230; }
+
+  /* ── Animated data flow particles ── */
+  .particle-canvas {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none; z-index: 1;
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 900px) {
+    .stage-label { width: 100px; }
+    .source-row { grid-template-columns: 1fr; }
+    .detail-panel { width: 100%; right: -100%; }
+  }
+
+  /* ── Color themes ── */
+  .theme-external { --accent: #5b8af5; }
+  .theme-internal { --accent: #42dba5; }
+  .theme-synthesis { --accent: #f59b42; }
+  .theme-generation { --accent: #a66bf5; }
+  .theme-output { --accent: #e05555; }
+
+  .framework-card.theme-external::before { background: #5b8af5; }
+  .framework-card.theme-internal::before { background: #42dba5; }
+  .framework-card.theme-synthesis::before { background: #f59b42; }
+  .framework-card.theme-generation::before { background: #a66bf5; }
+  .framework-card.theme-output::before { background: #e05555; }
+
+  /* ── Step indicator ── */
+  .step-line {
+    position: absolute; left: 80px; top: 0; bottom: 0; width: 2px;
+    background: linear-gradient(to bottom, #5b8af5, #42dba5, #f59b42, #a66bf5, #e05555);
+    opacity: 0.15; border-radius: 1px;
+  }
+  .step-dot {
+    position: absolute; left: 73px; width: 16px; height: 16px;
+    border-radius: 50%; border: 2px solid #fff;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+    z-index: 2;
+  }
+
+  /* ── SWOT grid ── */
+  .swot-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px;
+  }
+  .swot-cell {
+    padding: 10px 12px; border-radius: 8px; font-size: 12px; line-height: 1.5;
+    transition: all 0.3s;
+  }
+  .swot-cell.s { background: rgba(66,219,165,0.08); border: 1px solid rgba(66,219,165,0.2); }
+  .swot-cell.w { background: rgba(224,85,85,0.06); border: 1px solid rgba(224,85,85,0.15); }
+  .swot-cell.o { background: rgba(91,138,245,0.06); border: 1px solid rgba(91,138,245,0.15); }
+  .swot-cell.t { background: rgba(245,155,66,0.06); border: 1px solid rgba(245,155,66,0.15); }
+  .swot-cell-label {
+    font-size: 10px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.8px; margin-bottom: 4px;
+  }
+  .swot-cell.s .swot-cell-label { color: #42dba5; }
+  .swot-cell.w .swot-cell-label { color: #e05555; }
+  .swot-cell.o .swot-cell-label { color: #5b8af5; }
+  .swot-cell.t .swot-cell-label { color: #f59b42; }
+  .swot-cell .swot-items { color: #555; font-size: 11.5px; }
+  .swot-cell.highlight { transform: scale(1.03); box-shadow: 0 2px 12px rgba(0,0,0,0.08); }
+
+  /* ── TOWS matrix ── */
+  .tows-grid {
+    display: grid; grid-template-columns: auto 1fr 1fr; gap: 0; margin-top: 12px;
+    border: 1px solid rgba(196,163,90,0.15); border-radius: 10px; overflow: hidden;
+  }
+  .tows-cell {
+    padding: 10px 12px; font-size: 11.5px; line-height: 1.45; color: #555;
+    border-bottom: 1px solid rgba(196,163,90,0.08);
+    border-right: 1px solid rgba(196,163,90,0.08);
+    transition: all 0.3s;
+  }
+  .tows-cell:nth-child(3n) { border-right: none; }
+  .tows-header {
+    background: rgba(196,163,90,0.04); font-weight: 700; font-size: 11px;
+    color: #8a7230; text-transform: uppercase; letter-spacing: 0.5px;
+    text-align: center;
+  }
+  .tows-row-header {
+    background: rgba(196,163,90,0.04); font-weight: 700; font-size: 11px;
+    color: #8a7230; writing-mode: horizontal-tb; text-align: center;
+    display: flex; align-items: center; justify-content: center;
+    letter-spacing: 0.5px; text-transform: uppercase;
+  }
+  .tows-cell.active-cell {
+    background: rgba(166,107,245,0.06); box-shadow: inset 0 0 0 1.5px rgba(166,107,245,0.3);
+  }
+
+  /* ── Animated flow indicators ── */
+  @keyframes flowPulse {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 1; }
+  }
+  .flow-pulse { animation: flowPulse 2s ease-in-out infinite; }
+
+  @keyframes dataFlow {
+    0% { transform: translateY(-8px); opacity: 0; }
+    30% { opacity: 1; }
+    70% { opacity: 1; }
+    100% { transform: translateY(8px); opacity: 0; }
+  }
+
+  /* ── Interactive state ── */
+  .dim { opacity: 0.3; transition: opacity 0.3s; }
+  .bright { opacity: 1; transition: opacity 0.3s; }
+</style>
+</head>
+<body>
+
+<div id="header">
+  <div class="header-text">
+    <h1>Strategic Synthesis Process</h1>
+    <p>How analytical frameworks combine to produce strategic recommendations</p>
+  </div>
+</div>
+
+<div id="main">
+  <div class="intro">
+    <h2>From Analysis to Action</h2>
+    <p>Strategy isn't about running frameworks in isolation. The real value emerges when outputs from one analysis become inputs for the next. This map traces how raw environmental and internal data is progressively synthesised into actionable strategic recommendations.</p>
+  </div>
+
+  <div class="flow" id="flow">
+    <!-- Step line -->
+    <div class="step-line"></div>
+
+    <!-- ════ STAGE 1: External Scan ════ -->
+    <div class="stage-row" id="stage-1">
+      <div class="stage-label">
+        <div class="step-dot" style="background:#5b8af5; top: 30px;"></div>
+        <div class="stage-num" style="color:#5b8af5;">Stage 1</div>
+        <div class="stage-name">External Scan</div>
+        <div class="stage-desc">Mapping the environment the organisation operates in</div>
+      </div>
+      <div class="stage-content">
+        <div class="framework-card theme-external" id="card-pestel" onclick="showDetail('pestel')">
+          <div class="card-header">
+            <div class="card-icon" style="background:#5b8af5;">P</div>
+            <div>
+              <div class="card-title">PESTEL Analysis</div>
+              <div class="card-subtitle">Political, Economic, Social, Technological, Environmental, Legal</div>
+            </div>
+          </div>
+          <div class="card-body">
+            Scans the macro-environment for factors beyond the organisation's control. Each factor is assessed for its current impact and likely trajectory.
+          </div>
+          <div class="data-pills" id="pestel-pills">
+            <span class="pill" style="background:rgba(91,138,245,0.1); color:#5b8af5;" data-target="o">Opportunities identified</span>
+            <span class="pill" style="background:rgba(245,155,66,0.1); color:#f59b42;" data-target="t">Threats identified</span>
+            <span class="pill" style="background:rgba(196,163,90,0.08); color:#8a7230;">Trend trajectories</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════ STAGE 2: Internal Scan ════ -->
+    <div class="stage-row" id="stage-2">
+      <div class="stage-label">
+        <div class="step-dot" style="background:#42dba5; top: 30px;"></div>
+        <div class="stage-num" style="color:#42dba5;">Stage 2</div>
+        <div class="stage-name">Internal Scan</div>
+        <div class="stage-desc">Evaluating the organisation's own resources and capabilities</div>
+      </div>
+      <div class="stage-content">
+        <div class="framework-card theme-internal" id="card-vrio" onclick="showDetail('vrio')">
+          <div class="card-header">
+            <div class="card-icon" style="background:#42dba5;">V</div>
+            <div>
+              <div class="card-title">VRIO Analysis</div>
+              <div class="card-subtitle">Valuable, Rare, Inimitable, Organised-to-capture</div>
+            </div>
+          </div>
+          <div class="card-body">
+            Tests each internal resource or capability against four criteria. Only resources passing all four qualify as sustained competitive advantages.
+          </div>
+          <div class="data-pills" id="vrio-pills">
+            <span class="pill" style="background:rgba(66,219,165,0.1); color:#2a9d6e;" data-target="s">Confirmed strengths</span>
+            <span class="pill" style="background:rgba(224,85,85,0.08); color:#e05555;" data-target="w">Exposed weaknesses</span>
+            <span class="pill" style="background:rgba(196,163,90,0.08); color:#8a7230;">Competitive implications</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════ CONNECTOR: feeds into SWOT ════ -->
+    <div class="connector-zone">
+      <div class="stage-label"></div>
+      <div class="arrow-group">
+        <div class="flow-arrow" id="arrow-pestel-swot">
+          <div class="flow-arrow-label">PESTEL factors populate<br>Opportunities & Threats</div>
+          <svg width="180" height="36" viewBox="0 0 180 36">
+            <defs>
+              <marker id="ah1" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+                <path d="M0,0 L8,3 L0,6 Z" fill="#5b8af5"/>
+              </marker>
+            </defs>
+            <path d="M20,4 C60,4 60,32 90,18" stroke="#5b8af5" stroke-width="1.5" fill="none" stroke-dasharray="4,3" class="flow-pulse"/>
+            <path d="M90,18 C120,4 120,32 160,18" stroke="#5b8af5" stroke-width="1.5" fill="none" marker-end="url(#ah1)" stroke-dasharray="4,3" class="flow-pulse" style="animation-delay:0.5s"/>
+          </svg>
+        </div>
+        <div class="flow-arrow" id="arrow-vrio-swot">
+          <div class="flow-arrow-label">VRIO results populate<br>Strengths & Weaknesses</div>
+          <svg width="180" height="36" viewBox="0 0 180 36">
+            <defs>
+              <marker id="ah2" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+                <path d="M0,0 L8,3 L0,6 Z" fill="#42dba5"/>
+              </marker>
+            </defs>
+            <path d="M20,32 C60,32 60,4 90,18" stroke="#42dba5" stroke-width="1.5" fill="none" stroke-dasharray="4,3" class="flow-pulse" style="animation-delay:0.3s"/>
+            <path d="M90,18 C120,32 120,4 160,18" stroke="#42dba5" stroke-width="1.5" fill="none" marker-end="url(#ah2)" stroke-dasharray="4,3" class="flow-pulse" style="animation-delay:0.8s"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════ STAGE 3: Synthesis ════ -->
+    <div class="stage-row" id="stage-3">
+      <div class="stage-label">
+        <div class="step-dot" style="background:#f59b42; top: 30px;"></div>
+        <div class="stage-num" style="color:#f59b42;">Stage 3</div>
+        <div class="stage-name">Synthesis</div>
+        <div class="stage-desc">Combining external and internal findings into a unified picture</div>
+      </div>
+      <div class="stage-content">
+        <div class="framework-card theme-synthesis" id="card-swot" onclick="showDetail('swot')">
+          <div class="card-header">
+            <div class="card-icon" style="background:#f59b42;">S</div>
+            <div>
+              <div class="card-title">SWOT Analysis</div>
+              <div class="card-subtitle">The convergence point where external meets internal</div>
+            </div>
+          </div>
+          <div class="card-body">
+            SWOT doesn't generate its own data. It is a <strong>synthesis framework</strong> that organises outputs from the upstream analyses into four quadrants, creating a single integrated view of the strategic position.
+          </div>
+          <div class="swot-grid" id="swot-grid">
+            <div class="swot-cell s" data-source="vrio">
+              <div class="swot-cell-label">Strengths</div>
+              <div class="swot-items">VRIO-confirmed advantages, core competencies, resource strengths</div>
+            </div>
+            <div class="swot-cell w" data-source="vrio">
+              <div class="swot-cell-label">Weaknesses</div>
+              <div class="swot-items">Resources failing VRIO, capability gaps, competitive disadvantages</div>
+            </div>
+            <div class="swot-cell o" data-source="pestel">
+              <div class="swot-cell-label">Opportunities</div>
+              <div class="swot-items">Favourable PESTEL trends, market gaps, emerging demand, regulatory openings</div>
+            </div>
+            <div class="swot-cell t" data-source="pestel">
+              <div class="swot-cell-label">Threats</div>
+              <div class="swot-items">Adverse PESTEL trends, competitive pressures, regulatory risks</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════ CONNECTOR: SWOT → TOWS ════ -->
+    <div class="connector-zone">
+      <div class="stage-label"></div>
+      <div class="arrow-group">
+        <div class="flow-arrow" id="arrow-swot-tows">
+          <div class="flow-arrow-label">SWOT quadrants are cross-matched<br>to generate strategic options</div>
+          <svg width="220" height="36" viewBox="0 0 220 36">
+            <defs>
+              <marker id="ah3" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+                <path d="M0,0 L8,3 L0,6 Z" fill="#a66bf5"/>
+              </marker>
+            </defs>
+            <path d="M20,18 L200,18" stroke="#a66bf5" stroke-width="2" fill="none" marker-end="url(#ah3)" stroke-dasharray="6,4" class="flow-pulse"/>
+            <!-- Cross-match indicator dots -->
+            <circle cx="60" cy="18" r="3" fill="#42dba5" opacity="0.7" class="flow-pulse"/>
+            <circle cx="90" cy="18" r="3" fill="#e05555" opacity="0.7" class="flow-pulse" style="animation-delay:0.3s"/>
+            <circle cx="120" cy="18" r="3" fill="#5b8af5" opacity="0.7" class="flow-pulse" style="animation-delay:0.6s"/>
+            <circle cx="150" cy="18" r="3" fill="#f59b42" opacity="0.7" class="flow-pulse" style="animation-delay:0.9s"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════ STAGE 4: Option Generation ════ -->
+    <div class="stage-row" id="stage-4">
+      <div class="stage-label">
+        <div class="step-dot" style="background:#a66bf5; top: 30px;"></div>
+        <div class="stage-num" style="color:#a66bf5;">Stage 4</div>
+        <div class="stage-name">Option Generation</div>
+        <div class="stage-desc">Systematically producing strategic options from the SWOT picture</div>
+      </div>
+      <div class="stage-content">
+        <div class="framework-card theme-generation" id="card-tows" onclick="showDetail('tows')">
+          <div class="card-header">
+            <div class="card-icon" style="background:#a66bf5;">T</div>
+            <div>
+              <div class="card-title">TOWS Matrix</div>
+              <div class="card-subtitle">Turning the SWOT picture into strategic options</div>
+            </div>
+          </div>
+          <div class="card-body">
+            TOWS is the <strong>action engine</strong> of the synthesis process. It systematically crosses each internal factor (S/W) against each external factor (O/T) to force out strategic options that wouldn't surface from SWOT alone.
+          </div>
+          <div class="tows-grid" id="tows-grid">
+            <div class="tows-cell tows-header" style="border-right:1px solid rgba(196,163,90,0.08);"></div>
+            <div class="tows-cell tows-header">Opportunities</div>
+            <div class="tows-cell tows-header">Threats</div>
+
+            <div class="tows-cell tows-row-header">Strengths</div>
+            <div class="tows-cell" data-combo="so" onclick="highlightTows('so')">
+              <strong style="color:#a66bf5;">SO Strategies</strong><br>
+              <span style="font-size:11px; color:#888;">Use strengths to exploit opportunities</span><br>
+              <em style="font-size:11px; color:#666;">Maxi-Maxi</em>
+            </div>
+            <div class="tows-cell" data-combo="st" onclick="highlightTows('st')">
+              <strong style="color:#a66bf5;">ST Strategies</strong><br>
+              <span style="font-size:11px; color:#888;">Use strengths to counter threats</span><br>
+              <em style="font-size:11px; color:#666;">Maxi-Mini</em>
+            </div>
+
+            <div class="tows-cell tows-row-header">Weaknesses</div>
+            <div class="tows-cell" data-combo="wo" onclick="highlightTows('wo')">
+              <strong style="color:#a66bf5;">WO Strategies</strong><br>
+              <span style="font-size:11px; color:#888;">Address weaknesses to exploit opportunities</span><br>
+              <em style="font-size:11px; color:#666;">Mini-Maxi</em>
+            </div>
+            <div class="tows-cell" data-combo="wt" onclick="highlightTows('wt')">
+              <strong style="color:#a66bf5;">WT Strategies</strong><br>
+              <span style="font-size:11px; color:#888;">Minimise weaknesses and avoid threats</span><br>
+              <em style="font-size:11px; color:#666;">Mini-Mini (defensive)</em>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════ CONNECTOR: TOWS → Recommendations ════ -->
+    <div class="connector-zone">
+      <div class="stage-label"></div>
+      <div class="arrow-group">
+        <div class="flow-arrow" id="arrow-tows-recs">
+          <div class="flow-arrow-label">Strategic options are prioritised, evaluated,<br>and refined into recommendations</div>
+          <svg width="220" height="36" viewBox="0 0 220 36">
+            <defs>
+              <marker id="ah4" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+                <path d="M0,0 L8,3 L0,6 Z" fill="#e05555"/>
+              </marker>
+            </defs>
+            <path d="M20,18 L200,18" stroke="#e05555" stroke-width="2" fill="none" marker-end="url(#ah4)" stroke-dasharray="6,4" class="flow-pulse"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════ STAGE 5: Recommendations ════ -->
+    <div class="stage-row" id="stage-5">
+      <div class="stage-label">
+        <div class="step-dot" style="background:#e05555; top: 30px;"></div>
+        <div class="stage-num" style="color:#e05555;">Stage 5</div>
+        <div class="stage-name">Recommendations</div>
+        <div class="stage-desc">Evidence-based strategic recommendations with clear lineage</div>
+      </div>
+      <div class="stage-content">
+        <div class="framework-card theme-output" id="card-recs" onclick="showDetail('recs')">
+          <div class="card-header">
+            <div class="card-icon" style="background:#e05555;">R</div>
+            <div>
+              <div class="card-title">Strategic Recommendations</div>
+              <div class="card-subtitle">The output of the entire synthesis chain</div>
+            </div>
+          </div>
+          <div class="card-body">
+            Every recommendation traces back through the chain: which TOWS combination generated it, which SWOT factors informed it, and which PESTEL/VRIO findings originated the data. This <strong>audit trail</strong> is what makes the strategy evidence-based rather than opinion-based.
+          </div>
+          <div class="data-pills">
+            <span class="pill" style="background:rgba(166,107,245,0.08); color:#a66bf5;">SO-derived growth plays</span>
+            <span class="pill" style="background:rgba(166,107,245,0.08); color:#a66bf5;">ST-derived defensive moves</span>
+            <span class="pill" style="background:rgba(166,107,245,0.08); color:#a66bf5;">WO-derived development priorities</span>
+            <span class="pill" style="background:rgba(166,107,245,0.08); color:#a66bf5;">WT-derived risk mitigations</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /flow -->
+
+  <!-- ════ Traceability example ════ -->
+  <div style="margin-top: 50px; padding: 28px; background: rgba(196,163,90,0.03); border: 1px solid rgba(196,163,90,0.12); border-radius: 14px;">
+    <div style="font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: #C4A35A; margin-bottom: 12px;">Traceability Example</div>
+    <div style="font-family: 'Georgia', serif; font-size: 17px; color: #1a1a1a; margin-bottom: 14px;">How a single recommendation traces back to raw data</div>
+
+    <div id="trace-chain" style="display: flex; align-items: flex-start; gap: 0; flex-wrap: wrap;">
+
+      <div class="trace-step" style="flex: 1; min-width: 180px; padding: 14px; background: rgba(91,138,245,0.04); border-radius: 10px; border: 1px solid rgba(91,138,245,0.12); cursor:pointer;" onmouseenter="traceHighlight(1)" onmouseleave="traceClear()">
+        <div style="font-size: 10px; font-weight: 700; color: #5b8af5; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px;">PESTEL Finding</div>
+        <div style="font-size: 12.5px; color: #444; line-height: 1.5;">Government announces mobile money interoperability mandate (Political/Technological)</div>
+      </div>
+
+      <div style="display:flex; align-items:center; padding: 0 6px; color: #ccc; font-size: 20px;">&#8594;</div>
+
+      <div class="trace-step" style="flex: 1; min-width: 180px; padding: 14px; background: rgba(245,155,66,0.04); border-radius: 10px; border: 1px solid rgba(245,155,66,0.12); cursor:pointer;" onmouseenter="traceHighlight(2)" onmouseleave="traceClear()">
+        <div style="font-size: 10px; font-weight: 700; color: #f59b42; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px;">Enters SWOT as</div>
+        <div style="font-size: 12.5px; color: #444; line-height: 1.5;"><strong>Opportunity:</strong> New interoperability rules create level playing field for mobile banking expansion</div>
+      </div>
+
+      <div style="display:flex; align-items:center; padding: 0 6px; color: #ccc; font-size: 20px;">&#8594;</div>
+
+      <div class="trace-step" style="flex: 1; min-width: 180px; padding: 14px; background: rgba(166,107,245,0.04); border-radius: 10px; border: 1px solid rgba(166,107,245,0.12); cursor:pointer;" onmouseenter="traceHighlight(3)" onmouseleave="traceClear()">
+        <div style="font-size: 10px; font-weight: 700; color: #a66bf5; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px;">TOWS crosses with</div>
+        <div style="font-size: 12.5px; color: #444; line-height: 1.5;"><strong>Strength</strong> (from VRIO): Established KCB M-Pesa platform with 30M+ users = <strong>SO Strategy</strong></div>
+      </div>
+
+      <div style="display:flex; align-items:center; padding: 0 6px; color: #ccc; font-size: 20px;">&#8594;</div>
+
+      <div class="trace-step" style="flex: 1; min-width: 180px; padding: 14px; background: rgba(224,85,85,0.04); border-radius: 10px; border: 1px solid rgba(224,85,85,0.12); cursor:pointer;" onmouseenter="traceHighlight(4)" onmouseleave="traceClear()">
+        <div style="font-size: 10px; font-weight: 700; color: #e05555; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px;">Recommendation</div>
+        <div style="font-size: 12.5px; color: #444; line-height: 1.5;">Accelerate cross-platform mobile banking services leveraging existing user base before competitors catch up</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ════ Key insight ════ -->
+  <div style="margin-top: 30px; padding: 24px 28px; background: rgba(196,163,90,0.05); border-left: 3px solid #C4A35A; border-radius: 0 10px 10px 0;">
+    <div style="font-family: 'Georgia', serif; font-size: 15px; color: #1a1a1a; margin-bottom: 6px;">The Synthesis Principle</div>
+    <div style="font-size: 13px; color: #555; line-height: 1.65;">
+      PESTEL and VRIO are <strong>data-gathering</strong> tools. SWOT is a <strong>synthesis</strong> framework. TOWS is a <strong>generation</strong> engine. Each plays a distinct role in the chain. Running them in isolation produces lists; running them as a connected pipeline produces strategy. The discipline is in the connections between the frameworks, not in any single framework itself.
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+<!-- ════ Detail Panel ════ -->
+<div class="detail-panel" id="detail-panel">
+  <div class="detail-close" onclick="closeDetail()">&times;</div>
+  <div id="detail-content"></div>
+</div>
+
+<script>
+const details = {
+  pestel: {
+    badge: { label: 'Stage 1 — External Scan', bg: 'rgba(91,138,245,0.1)', color: '#5b8af5' },
+    title: 'PESTEL Analysis',
+    purpose: 'PESTEL scans the macro-environment across six dimensions. In the synthesis chain, its role is to generate the raw material for the external half of the SWOT matrix.',
+    sections: [
+      {
+        title: 'What it produces for the chain',
+        items: [
+          { color: '#5b8af5', html: '<strong>Opportunities</strong> from favourable macro-trends (e.g. supportive regulation, growing digital adoption, emerging market segments)' },
+          { color: '#f59b42', html: '<strong>Threats</strong> from adverse macro-trends (e.g. political instability, interest rate hikes, new compliance requirements)' },
+          { color: '#C4A35A', html: '<strong>Trend trajectories</strong> — whether each factor is intensifying, stable, or receding — which helps prioritise within the SWOT' },
+        ]
+      },
+      {
+        title: 'How it connects forward',
+        note: 'PESTEL findings don\'t stay as a standalone list. Each finding is classified as either an Opportunity or a Threat and placed into the corresponding SWOT quadrant. The specificity of the PESTEL finding (e.g. "Central Bank digital currency pilot in Q3") gives the SWOT entry substance rather than being a vague "regulatory environment changing".'
+      }
+    ]
+  },
+  vrio: {
+    badge: { label: 'Stage 2 — Internal Scan', bg: 'rgba(66,219,165,0.1)', color: '#42dba5' },
+    title: 'VRIO Analysis',
+    purpose: 'VRIO tests whether internal resources and capabilities are genuine sources of competitive advantage. In the synthesis chain, it populates the internal half of the SWOT matrix with evidence-based assessments rather than assumptions.',
+    sections: [
+      {
+        title: 'What it produces for the chain',
+        items: [
+          { color: '#42dba5', html: '<strong>Confirmed Strengths</strong> — resources that pass all four VRIO tests become genuine Strengths in the SWOT (sustained competitive advantages)' },
+          { color: '#e05555', html: '<strong>Exposed Weaknesses</strong> — resources that fail one or more tests reveal competitive parity or disadvantage, mapped to SWOT Weaknesses' },
+          { color: '#C4A35A', html: '<strong>Competitive implication level</strong> — whether each resource provides temporary advantage, sustained advantage, or parity' },
+        ]
+      },
+      {
+        title: 'How it connects forward',
+        note: 'Without VRIO, SWOT strengths are often just a list of "things we\'re good at" without evidence they create competitive advantage. VRIO provides the rigour: only resources that are Valuable, Rare, hard to Imitate, and that the Organisation is set up to exploit qualify as genuine strategic strengths.'
+      }
+    ]
+  },
+  swot: {
+    badge: { label: 'Stage 3 — Synthesis', bg: 'rgba(245,155,66,0.1)', color: '#f59b42' },
+    title: 'SWOT Analysis',
+    purpose: 'SWOT is the convergence point of the entire synthesis process. It doesn\'t discover new information — it organises and reconciles the outputs of the upstream frameworks into a unified strategic picture.',
+    sections: [
+      {
+        title: 'How it receives data',
+        items: [
+          { color: '#42dba5', html: '<strong>Strengths</strong> ← VRIO-confirmed competitive advantages' },
+          { color: '#e05555', html: '<strong>Weaknesses</strong> ← Resources/capabilities that failed the VRIO test' },
+          { color: '#5b8af5', html: '<strong>Opportunities</strong> ← Favourable findings from the PESTEL scan' },
+          { color: '#f59b42', html: '<strong>Threats</strong> ← Adverse findings from the PESTEL scan' },
+        ]
+      },
+      {
+        title: 'The synthesis it performs',
+        note: 'The value of SWOT is not the four quadrants themselves but the juxtaposition: seeing internal and external factors side by side reveals strategic tensions (e.g. a strength that could exploit an opportunity, or a weakness exposed by an incoming threat). This is what makes the next step — TOWS — possible.'
+      }
+    ]
+  },
+  tows: {
+    badge: { label: 'Stage 4 — Option Generation', bg: 'rgba(166,107,245,0.1)', color: '#a66bf5' },
+    title: 'TOWS Matrix',
+    purpose: 'TOWS takes the static SWOT picture and turns it into dynamic strategic options by systematically crossing each internal factor against each external factor. It is the mechanism that converts analysis into action.',
+    sections: [
+      {
+        title: 'The four combinations',
+        items: [
+          { color: '#a66bf5', html: '<strong>SO (Maxi-Maxi)</strong> — Use strengths to seize opportunities. Aggressive growth strategies.' },
+          { color: '#a66bf5', html: '<strong>ST (Maxi-Mini)</strong> — Use strengths to neutralise threats. Competitive defence strategies.' },
+          { color: '#a66bf5', html: '<strong>WO (Mini-Maxi)</strong> — Overcome weaknesses to capture opportunities. Development strategies.' },
+          { color: '#a66bf5', html: '<strong>WT (Mini-Mini)</strong> — Minimise weaknesses and avoid threats. Defensive/retrenchment strategies.' },
+        ]
+      },
+      {
+        title: 'Why TOWS matters',
+        note: 'Many organisations stop at SWOT and make intuitive leaps to strategy. TOWS imposes discipline by forcing every combination to be examined. This often surfaces strategies that intuition would miss — particularly WO strategies (investing to fix a weakness because a major opportunity demands it) and ST strategies (using an existing strength as a shield against a specific threat).'
+      }
+    ]
+  },
+  recs: {
+    badge: { label: 'Stage 5 — Output', bg: 'rgba(224,85,85,0.1)', color: '#e05555' },
+    title: 'Strategic Recommendations',
+    purpose: 'The final output of the synthesis chain. Each recommendation carries a full evidence trail back through the frameworks, making the strategy defensible and auditable.',
+    sections: [
+      {
+        title: 'What makes a recommendation evidence-based',
+        items: [
+          { color: '#e05555', html: '<strong>Traceable origin</strong> — links back to specific PESTEL findings or VRIO assessments' },
+          { color: '#e05555', html: '<strong>Clear TOWS logic</strong> — identifies which combination (SO/ST/WO/WT) generated it' },
+          { color: '#e05555', html: '<strong>Prioritised</strong> — ranked by strategic importance based on the strength of underlying evidence' },
+          { color: '#e05555', html: '<strong>Actionable</strong> — specific enough to translate into implementation plans' },
+        ]
+      },
+      {
+        title: 'The audit trail',
+        note: 'When stakeholders ask "why this strategy?", the synthesis chain provides the answer: "Because PESTEL identified [factor], VRIO confirmed [capability], SWOT highlighted the [S/W] × [O/T] intersection, and TOWS generated this specific strategic option." This is the difference between strategy-as-opinion and strategy-as-analysis.'
+      }
+    ]
+  }
+};
+
+function showDetail(id) {
+  const d = details[id];
+  const panel = document.getElementById('detail-panel');
+  const content = document.getElementById('detail-content');
+
+  let html = `
+    <div class="detail-badge" style="background:${d.badge.bg}; color:${d.badge.color}">${d.badge.label}</div>
+    <div class="detail-title">${d.title}</div>
+    <div class="detail-purpose">${d.purpose}</div>
+  `;
+
+  d.sections.forEach(s => {
+    html += `<div class="detail-section-title">${s.title}</div>`;
+    if (s.items) {
+      s.items.forEach(item => {
+        html += `<div class="output-item"><div class="output-dot" style="background:${item.color}"></div><div class="output-text">${item.html}</div></div>`;
+      });
+    }
+    if (s.note) {
+      html += `<div class="synthesis-note"><p>${s.note}</p></div>`;
+    }
+  });
+
+  content.innerHTML = html;
+  panel.classList.add('open');
+
+  // Highlight corresponding card
+  document.querySelectorAll('.framework-card').forEach(c => c.classList.remove('active'));
+  document.getElementById('card-' + id)?.classList.add('active');
+}
+
+function closeDetail() {
+  document.getElementById('detail-panel').classList.remove('open');
+  document.querySelectorAll('.framework-card').forEach(c => c.classList.remove('active'));
+}
+
+// TOWS cell highlight
+function highlightTows(combo) {
+  document.querySelectorAll('.tows-cell[data-combo]').forEach(c => c.classList.remove('active-cell'));
+  const cell = document.querySelector(`.tows-cell[data-combo="${combo}"]`);
+  if (cell) cell.classList.add('active-cell');
+
+  // Highlight related SWOT cells
+  const swotMap = {
+    so: ['s', 'o'], st: ['s', 't'], wo: ['w', 'o'], wt: ['w', 't']
+  };
+  document.querySelectorAll('.swot-cell').forEach(c => c.classList.remove('highlight'));
+  (swotMap[combo] || []).forEach(q => {
+    document.querySelector(`.swot-cell.${q}`)?.classList.add('highlight');
+  });
+}
+
+// Trace example hover
+function traceHighlight(step) {
+  const steps = document.querySelectorAll('.trace-step');
+  steps.forEach((s, i) => {
+    if (i < step) {
+      s.style.transform = 'scale(1.02)';
+      s.style.boxShadow = '0 2px 12px rgba(196,163,90,0.15)';
+    } else {
+      s.style.transform = '';
+      s.style.boxShadow = '';
+    }
+  });
+}
+
+function traceClear() {
+  document.querySelectorAll('.trace-step').forEach(s => {
+    s.style.transform = '';
+    s.style.boxShadow = '';
+  });
+}
+
+// Close detail on Escape
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeDetail();
+});
+
+// Close detail on click outside
+document.addEventListener('click', e => {
+  const panel = document.getElementById('detail-panel');
+  if (panel.classList.contains('open') &&
+      !panel.contains(e.target) &&
+      !e.target.closest('.framework-card')) {
+    closeDetail();
+  }
+});
+</script>
+
+</body>
+</html>
