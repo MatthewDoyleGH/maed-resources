@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blue Ocean Synthesis Process — Cirque du Soleil Case Study</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Calibri', 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: #FFFFFF;
+    color: #2a2a2a;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  #header {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: linear-gradient(180deg, rgba(255,255,255,0.97) 0%, rgba(255,255,255,0.85) 80%, transparent 100%);
+    padding: 18px 30px 30px;
+    pointer-events: none;
+    display: flex; align-items: center; gap: 18px;
+  }
+  #header img { height: 40px; opacity: 0.95; }
+  #header .header-text { display: flex; flex-direction: column; }
+  #header .header-divider { width: 1px; height: 36px; background: #C4A35A; opacity: 0.5; flex-shrink: 0; }
+  #header h1 { font-family: 'Georgia', serif; font-size: 20px; font-weight: 700; color: #1a1a1a; letter-spacing: 0.3px; }
+  #header p { font-size: 12px; color: #666; margin-top: 3px; }
+
+  #main { padding: 90px 30px 40px; max-width: 1400px; margin: 0 auto; }
+
+  .intro {
+    text-align: center; margin-bottom: 40px; max-width: 720px; margin-left: auto; margin-right: auto;
+  }
+  .intro h2 {
+    font-family: 'Georgia', serif; font-size: 22px; color: #1a1a1a; margin-bottom: 8px;
+  }
+  .intro p { font-size: 14px; color: #666; line-height: 1.6; }
+
+  /* ── Flow container ── */
+  .flow { position: relative; }
+
+  /* ── Stage rows ── */
+  .stage-row {
+    display: flex; align-items: stretch; gap: 24px; margin-bottom: 0;
+    position: relative;
+  }
+
+  .stage-label {
+    width: 160px; flex-shrink: 0; padding: 20px 0;
+    display: flex; flex-direction: column; justify-content: center;
+  }
+  .stage-num {
+    font-size: 11px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 1.2px; margin-bottom: 4px;
+  }
+  .stage-name {
+    font-family: 'Georgia', serif; font-size: 17px; font-weight: 700; color: #1a1a1a;
+  }
+  .stage-desc { font-size: 11.5px; color: #888; margin-top: 4px; line-height: 1.4; }
+
+  .stage-content { flex: 1; padding: 16px 0; }
+
+  /* ── Cards ── */
+  .framework-card {
+    background: #fff;
+    border: 1.5px solid rgba(196,163,90,0.2);
+    border-radius: 12px;
+    padding: 20px 24px;
+    cursor: default;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  .framework-card:hover {
+    border-color: rgba(196,163,90,0.5);
+    box-shadow: 0 4px 24px rgba(196,163,90,0.12);
+    transform: translateY(-2px);
+  }
+  .framework-card.active {
+    border-color: rgba(196,163,90,0.7);
+    box-shadow: 0 6px 32px rgba(196,163,90,0.18);
+  }
+  .framework-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  }
+
+  .card-header { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+  .card-icon {
+    width: 40px; height: 40px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; font-weight: 700; color: #fff; flex-shrink: 0;
+  }
+  .card-title { font-size: 16px; font-weight: 700; color: #1a1a1a; }
+  .card-subtitle { font-size: 11px; color: #888; margin-top: 1px; }
+
+  .card-body { font-size: 13px; color: #555; line-height: 1.55; }
+
+  /* ── Data pills ── */
+  .data-pills { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+  .pill {
+    font-size: 11px; padding: 4px 10px; border-radius: 20px;
+    font-weight: 600; letter-spacing: 0.3px;
+    transition: all 0.3s;
+  }
+  .pill.highlight { transform: scale(1.08); box-shadow: 0 2px 8px rgba(0,0,0,0.12); }
+
+  /* ── Connector arrows ── */
+  .connector-zone {
+    display: flex; align-items: center; justify-content: center;
+    padding: 8px 0; position: relative;
+  }
+  .connector-zone .stage-label { visibility: hidden; }
+
+  .arrow-group {
+    flex: 1; display: flex; align-items: center; justify-content: center;
+    gap: 16px; position: relative; min-height: 60px;
+  }
+
+  .flow-arrow {
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    transition: all 0.3s;
+  }
+  .flow-arrow svg { transition: all 0.3s; }
+  .flow-arrow.active svg { filter: drop-shadow(0 2px 6px rgba(196,163,90,0.3)); }
+  .flow-arrow-label {
+    font-size: 10.5px; color: #999; font-weight: 600; text-align: center;
+    max-width: 180px; line-height: 1.3; letter-spacing: 0.3px;
+    text-transform: uppercase;
+  }
+  .flow-arrow.active .flow-arrow-label { color: #C4A35A; }
+
+  /* ── Source cards in a row ── */
+  .source-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+
+  /* ── Floating tooltip ── */
+  #tooltip {
+    position: fixed;
+    display: none;
+    background: rgba(255, 255, 255, 0.96);
+    border: 1px solid rgba(196,163,90,0.3);
+    border-radius: 10px;
+    padding: 16px 18px;
+    max-width: 360px;
+    z-index: 200;
+    backdrop-filter: blur(12px);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.12), 0 0 0 1px rgba(196,163,90,0.1);
+    pointer-events: none;
+  }
+  .detail-badge {
+    display: inline-block; font-size: 10px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 1px;
+    padding: 3px 10px; border-radius: 4px; margin-bottom: 8px;
+  }
+  .detail-title {
+    font-family: 'Georgia', serif; font-size: 16px; font-weight: 700;
+    color: #1a1a1a; margin-bottom: 6px;
+  }
+  .detail-purpose { font-size: 12.5px; color: #555; line-height: 1.55; margin-bottom: 12px; }
+
+  .detail-section-title {
+    font-size: 10px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.8px; color: #C4A35A; margin-bottom: 6px; margin-top: 12px;
+  }
+
+  .output-item {
+    display: flex; align-items: flex-start; gap: 8px;
+    padding: 5px 0;
+  }
+  .output-dot {
+    width: 7px; height: 7px; border-radius: 50%; margin-top: 5px; flex-shrink: 0;
+  }
+  .output-text { font-size: 12px; color: #444; line-height: 1.45; }
+  .output-text strong { color: #1a1a1a; }
+
+  .synthesis-note {
+    background: rgba(196,163,90,0.06); border: 1px solid rgba(196,163,90,0.15);
+    border-radius: 6px; padding: 8px 10px; margin-top: 8px;
+  }
+  .synthesis-note p { font-size: 11.5px; color: #666; line-height: 1.5; }
+  .synthesis-note strong { color: #8a7230; }
+
+  /* ── Animated data flow particles ── */
+  .particle-canvas {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none; z-index: 1;
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 900px) {
+    .stage-label { width: 100px; }
+    .source-row { grid-template-columns: 1fr; }
+    #tooltip { max-width: 280px; }
+  }
+
+  /* ── Color themes ── */
+  .theme-external { --accent: #5b8af5; }
+  .theme-internal { --accent: #42dba5; }
+  .theme-synthesis { --accent: #f59b42; }
+  .theme-generation { --accent: #a66bf5; }
+  .theme-output { --accent: #e05555; }
+
+  .framework-card.theme-external::before { background: #5b8af5; }
+  .framework-card.theme-internal::before { background: #42dba5; }
+  .framework-card.theme-synthesis::before { background: #f59b42; }
+  .framework-card.theme-generation::before { background: #a66bf5; }
+  .framework-card.theme-output::before { background: #e05555; }
+
+  /* ── Step indicator ── */
+  .step-line {
+    position: absolute; left: 80px; top: 0; bottom: 0; width: 2px;
+    background: linear-gradient(to bottom, #5b8af5, #42dba5, #f59b42, #a66bf5, #e05555);
+    opacity: 0.15; border-radius: 1px;
+  }
+  .step-dot {
+    position: absolute; left: 73px; width: 16px; height: 16px;
+    border-radius: 50%; border: 2px solid #fff;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+    z-index: 2;
+  }
+
+  /* ── SWOT grid ── */
+  .swot-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px;
+  }
+  .swot-cell {
+    padding: 10px 12px; border-radius: 8px; font-size: 12px; line-height: 1.5;
+    transition: all 0.3s;
+  }
+  .swot-cell.s { background: rgba(66,219,165,0.08); border: 1px solid rgba(66,219,165,0.2); }
+  .swot-cell.w { background: rgba(224,85,85,0.06); border: 1px solid rgba(224,85,85,0.15); }
+  .swot-cell.o { background: rgba(91,138,245,0.06); border: 1px solid rgba(91,138,245,0.15); }
+  .swot-cell.t { background: rgba(245,155,66,0.06); border: 1px solid rgba(245,155,66,0.15); }
+  .swot-cell-label {
+    font-size: 10px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.8px; margin-bottom: 4px;
+  }
+  .swot-cell.s .swot-cell-label { color: #42dba5; }
+  .swot-cell.w .swot-cell-label { color: #e05555; }
+  .swot-cell.o .swot-cell-label { color: #5b8af5; }
+  .swot-cell.t .swot-cell-label { color: #f59b42; }
+  .swot-cell .swot-items { color: #555; font-size: 11.5px; }
+  .swot-cell.highlight { transform: scale(1.03); box-shadow: 0 2px 12px rgba(0,0,0,0.08); }
+
+  /* ── TOWS matrix ── */
+  .tows-grid {
+    display: grid; grid-template-columns: auto 1fr 1fr; gap: 0; margin-top: 12px;
+    border: 1px solid rgba(196,163,90,0.15); border-radius: 10px; overflow: hidden;
+  }
+  .tows-cell {
+    padding: 10px 12px; font-size: 11.5px; line-height: 1.45; color: #555;
+    border-bottom: 1px solid rgba(196,163,90,0.08);
+    border-right: 1px solid rgba(196,163,90,0.08);
+    transition: all 0.3s;
+  }
+  .tows-cell:nth-child(3n) { border-right: none; }
+  .tows-header {
+    background: rgba(196,163,90,0.04); font-weight: 700; font-size: 11px;
+    color: #8a7230; text-transform: uppercase; letter-spacing: 0.5px;
+    text-align: center;
+  }
+  .tows-row-header {
+    background: rgba(196,163,90,0.04); font-weight: 700; font-size: 11px;
+    color: #8a7230; writing-mode: horizontal-tb; text-align: center;
+    display: flex; align-items: center; justify-content: center;
+    letter-spacing: 0.5px; text-transform: uppercase;
+  }
+  .tows-cell.active-cell {
+    background: rgba(166,107,245,0.06); box-shadow: inset 0 0 0 1.5px rgba(166,107,245,0.3);
+  }
+
+  /* ── Animated flow indicators ── */
+  @keyframes flowPulse {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 1; }
+  }
+  .flow-pulse { animation: flowPulse 2s ease-in-out infinite; }
+
+  @keyframes dataFlow {
+    0% { transform: translateY(-8px); opacity: 0; }
+    30% { opacity: 1; }
+    70% { opacity: 1; }
+    100% { transform: translateY(8px); opacity: 0; }
+  }
+
+  /* ── Interactive state ── */
+  .dim { opacity: 0.3; transition: opacity 0.3s; }
+  .bright { opacity: 1; transition: opacity 0.3s; }
+</style>
+</head>
+<body>
+
+<div id="header">
+  <img src="data:image/png;base64,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" alt="mæd partners" style="height:40px;"/>
+  <div class="header-divider"></div>
+  <div class="header-text">
+    <h1>Blue Ocean Synthesis Process — Cirque du Soleil</h1>
+    <p>Applying the Blue Ocean synthesis chain retrospectively to Guy Laliberté's creation of a new performing-arts category, 1984–2004</p>
+  </div>
+</div>
+
+<div id="main">
+  <div class="intro">
+    <h2>From Red Ocean to Blue Ocean — Reinventing the Circus</h2>
+    <p>In 1984, Guy Laliberté was a 24-year-old Québec street performer and fire-breather. With a modest grant from the Québec government to mark Canada's 450th-anniversary celebrations, he and a group of fellow street performers — including Daniel Gauthier and Gilles Ste-Croix — staged <em>Le Grand Tour du Cirque du Soleil</em>. The traditional circus industry they were entering had been in structural decline for decades: children's TV and theme parks had eroded the audience, animal-welfare campaigns had become a serious threat, and star performers had pricing power the circuses could no longer afford. By 2000, Cirque du Soleil was generating more revenue than the top ten traditional circuses combined. By 2015 it had played to more than 150 million spectators in over 450 cities and was held up in every strategy textbook as the defining example of "blue ocean" value innovation — a company that had not out-competed rivals but made them irrelevant.</p>
+    <p>This map applies the Blue Ocean synthesis chain <em>retrospectively</em> to Cirque's strategic moves in its first twenty years. The team did not literally read W. Chan Kim and Renée Mauborgne — Kim and Mauborgne published <em>Blue Ocean Strategy</em> in 2005, more than two decades after Cirque's founding, and used Cirque as one of their primary case examples. The value of reading Cirque through the synthesis chain is that it makes visible <em>why</em> the strategic moves held together as a system, and why attempts to copy Cirque piecemeal (just the aesthetic, just the music, just the costuming) have consistently failed. It is honest to note at the outset that Cirque's later history complicates the story: the post-2008 phase of aggressive licensing, acquisitions and leveraged ownership culminated in a 2020 COVID-era bankruptcy filing, and the company was subsequently reorganised under new owners. The case studies a textbook blue ocean that was gradually sailed back into red water — which is itself a teaching point about the durability of value-innovation strategies under conventional growth-through-acquisition logic.</p>
+  </div>
+
+  <div class="flow" id="flow">
+    <!-- Step line -->
+    <div class="step-line"></div>
+
+    <!-- ════ STAGE 1: External Scan ════ -->
+    <div class="stage-row" id="stage-1">
+      <div class="stage-label">
+        <div class="step-dot" style="background:#5b8af5; top: 30px;"></div>
+        <div class="stage-num" style="color:#5b8af5;">Stage 1</div>
+        <div class="stage-name">External Scan</div>
+        <div class="stage-desc">Mapping the environment the organisation operates in</div>
+      </div>
+      <div class="stage-content">
+        <div class="framework-card theme-external" id="card-pestel" onmouseenter="showDetail(event, 'pestel')" onmousemove="positionTooltip(event)" onmouseleave="hideTooltip()">
+          <div class="card-header">
+            <div class="card-icon" style="background:#5b8af5;">P</div>
+            <div>
+              <div class="card-title">PESTEL Analysis</div>
+              <div class="card-subtitle">Political, Economic, Social, Technological, Environmental, Legal</div>
+            </div>
+          </div>
+          <div class="card-body">
+            In the Blue Ocean variant of the synthesis chain, Stage 1 is a <em>demand-side scan</em> — looking not just at the existing industry structure but at the non-customers the industry had lost or never served. For Cirque, the scan covered the declining traditional circus industry, adjacent performing-arts categories (theatre, ballet, Broadway musicals) and the three tiers of non-customers: soon-to-be-former customers, refusing customers, and unexplored customers.
+          </div>
+          <div class="data-pills" id="pestel-pills">
+            <span class="pill" style="background:rgba(91,138,245,0.1); color:#5b8af5;" data-target="o">Adults who abandoned circus in childhood</span>
+            <span class="pill" style="background:rgba(91,138,245,0.1); color:#5b8af5;" data-target="o">Theatre-goers looking for novelty</span>
+            <span class="pill" style="background:rgba(245,155,66,0.1); color:#f59b42;" data-target="t">Animal-welfare political shift</span>
+            <span class="pill" style="background:rgba(196,163,90,0.08); color:#8a7230;">Québec cultural-support funding</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════ STAGE 2: Internal Scan ════ -->
+    <div class="stage-row" id="stage-2">
+      <div class="stage-label">
+        <div class="step-dot" style="background:#42dba5; top: 30px;"></div>
+        <div class="stage-num" style="color:#42dba5;">Stage 2</div>
+        <div class="stage-name">Internal Scan</div>
+        <div class="stage-desc">Evaluating the organisation's own resources and capabilities</div>
+      </div>
+      <div class="stage-content">
+        <div class="framework-card theme-internal" id="card-vrio" onmouseenter="showDetail(event, 'vrio')" onmousemove="positionTooltip(event)" onmouseleave="hideTooltip()">
+          <div class="card-header">
+            <div class="card-icon" style="background:#42dba5;">V</div>
+            <div>
+              <div class="card-title">VRIO Analysis</div>
+              <div class="card-subtitle">Valuable, Rare, Inimitable, Organised-to-capture</div>
+            </div>
+          </div>
+          <div class="card-body">
+            Stage 2 is a <em>value-chain audit</em> rather than a classic VRIO. The question is which current-state cost drivers are worth keeping and which are worth eliminating entirely — the founding insight of value innovation is that differentiation <em>and</em> lower cost are achievable simultaneously by making sharp choices about what to do and what to refuse to do. For Cirque, this was the most consequential stage of the synthesis.
+          </div>
+          <div class="data-pills" id="vrio-pills">
+            <span class="pill" style="background:rgba(66,219,165,0.1); color:#2a9d6e;" data-target="s">Street-performance creative network</span>
+            <span class="pill" style="background:rgba(66,219,165,0.1); color:#2a9d6e;" data-target="s">No legacy circus infrastructure</span>
+            <span class="pill" style="background:rgba(224,85,85,0.08); color:#e05555;" data-target="w">No brand recognition, no capital</span>
+            <span class="pill" style="background:rgba(196,163,90,0.08); color:#8a7230;">Québec as a low-cost creative hub</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════ CONNECTOR: feeds into SWOT ════ -->
+    <div class="connector-zone">
+      <div class="stage-label"></div>
+      <div class="arrow-group">
+        <div class="flow-arrow" id="arrow-pestel-swot">
+          <div class="flow-arrow-label">PESTEL factors populate<br>Opportunities & Threats</div>
+          <svg width="180" height="36" viewBox="0 0 180 36">
+            <defs>
+              <marker id="ah1" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+                <path d="M0,0 L8,3 L0,6 Z" fill="#5b8af5"/>
+              </marker>
+            </defs>
+            <path d="M20,4 C60,4 60,32 90,18" stroke="#5b8af5" stroke-width="1.5" fill="none" stroke-dasharray="4,3" class="flow-pulse"/>
+            <path d="M90,18 C120,4 120,32 160,18" stroke="#5b8af5" stroke-width="1.5" fill="none" marker-end="url(#ah1)" stroke-dasharray="4,3" class="flow-pulse" style="animation-delay:0.5s"/>
+          </svg>
+        </div>
+        <div class="flow-arrow" id="arrow-vrio-swot">
+          <div class="flow-arrow-label">VRIO results populate<br>Strengths & Weaknesses</div>
+          <svg width="180" height="36" viewBox="0 0 180 36">
+            <defs>
+              <marker id="ah2" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+                <path d="M0,0 L8,3 L0,6 Z" fill="#42dba5"/>
+              </marker>
+            </defs>
+            <path d="M20,32 C60,32 60,4 90,18" stroke="#42dba5" stroke-width="1.5" fill="none" stroke-dasharray="4,3" class="flow-pulse" style="animation-delay:0.3s"/>
+            <path d="M90,18 C120,32 120,4 160,18" stroke="#42dba5" stroke-width="1.5" fill="none" marker-end="url(#ah2)" stroke-dasharray="4,3" class="flow-pulse" style="animation-delay:0.8s"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════ STAGE 3: Synthesis ════ -->
+    <div class="stage-row" id="stage-3">
+      <div class="stage-label">
+        <div class="step-dot" style="background:#f59b42; top: 30px;"></div>
+        <div class="stage-num" style="color:#f59b42;">Stage 3</div>
+        <div class="stage-name">Synthesis</div>
+        <div class="stage-desc">Combining external and internal findings into a unified picture</div>
+      </div>
+      <div class="stage-content">
+        <div class="framework-card theme-synthesis" id="card-swot" onmouseenter="showDetail(event, 'swot')" onmousemove="positionTooltip(event)" onmouseleave="hideTooltip()">
+          <div class="card-header">
+            <div class="card-icon" style="background:#f59b42;">S</div>
+            <div>
+              <div class="card-title">SWOT Analysis</div>
+              <div class="card-subtitle">The convergence point where external meets internal</div>
+            </div>
+          </div>
+          <div class="card-body">
+            In the Blue Ocean variant, Stage 3 is a <em>value innovation map</em> — equivalent to SWOT in the main chain, but deliberately reframed as a divergence exercise. Instead of listing strengths and weaknesses versus competitors, the map identifies the factors the industry takes for granted and asks which of them to <strong>Eliminate</strong>, <strong>Reduce</strong>, <strong>Raise</strong> and <strong>Create</strong>. The output is a new value curve that diverges sharply from the industry benchmark — Cirque's is the canonical example.
+          </div>
+          <div class="swot-grid" id="swot-grid">
+            <div class="swot-cell s" data-source="vrio">
+              <div class="swot-cell-label">Raise (vs industry)</div>
+              <div class="swot-items">Venue aesthetics and production values (premium lighting, costume design, staging); ticket prices (into theatre-premium range, not circus-budget); artistic music and live orchestration; dedicated theme and narrative per production; adult appeal in tone and content</div>
+            </div>
+            <div class="swot-cell w" data-source="vrio">
+              <div class="swot-cell-label">Eliminate (vs industry)</div>
+              <div class="swot-items">Animal acts entirely (removing the single biggest legacy cost, welfare-protest risk, and logistical constraint); star performers with name-above-the-marquee pricing power; three-ring parallel arenas; aisle concessions and sideshows; the children-centric marketing identity that had shrunk the addressable audience</div>
+            </div>
+            <div class="swot-cell o" data-source="pestel">
+              <div class="swot-cell-label">Create (new to industry)</div>
+              <div class="swot-items">A coherent theatrical theme and storyline per production (<em>Nouvelle Expérience</em>, <em>Saltimbanco</em>, <em>Mystère</em>, <em>O</em>, <em>KÀ</em> — each self-contained); original composed music and costume design as signature assets; resident Las Vegas productions co-invested with casino operators; multiple simultaneous touring shows under one brand; corporate event and private booking as a structural revenue floor</div>
+            </div>
+            <div class="swot-cell t" data-source="pestel">
+              <div class="swot-cell-label">Reduce (vs industry)</div>
+              <div class="swot-items">Pure thrill-and-danger spectacle (in favour of artistic narrative); physical stunts as stand-alone set-pieces (integrated into story instead); dependence on external distribution (managed through own venue relationships and touring contracts); the breadth of market positioning (deliberately premium, not mass)</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════ CONNECTOR: SWOT → TOWS ════ -->
+    <div class="connector-zone">
+      <div class="stage-label"></div>
+      <div class="arrow-group">
+        <div class="flow-arrow" id="arrow-swot-tows">
+          <div class="flow-arrow-label">SWOT quadrants are cross-matched<br>to generate strategic options</div>
+          <svg width="220" height="36" viewBox="0 0 220 36">
+            <defs>
+              <marker id="ah3" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+                <path d="M0,0 L8,3 L0,6 Z" fill="#a66bf5"/>
+              </marker>
+            </defs>
+            <path d="M20,18 L200,18" stroke="#a66bf5" stroke-width="2" fill="none" marker-end="url(#ah3)" stroke-dasharray="6,4" class="flow-pulse"/>
+            <!-- Cross-match indicator dots -->
+            <circle cx="60" cy="18" r="3" fill="#42dba5" opacity="0.7" class="flow-pulse"/>
+            <circle cx="90" cy="18" r="3" fill="#e05555" opacity="0.7" class="flow-pulse" style="animation-delay:0.3s"/>
+            <circle cx="120" cy="18" r="3" fill="#5b8af5" opacity="0.7" class="flow-pulse" style="animation-delay:0.6s"/>
+            <circle cx="150" cy="18" r="3" fill="#f59b42" opacity="0.7" class="flow-pulse" style="animation-delay:0.9s"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════ STAGE 4: Option Generation ════ -->
+    <div class="stage-row" id="stage-4">
+      <div class="stage-label">
+        <div class="step-dot" style="background:#a66bf5; top: 30px;"></div>
+        <div class="stage-num" style="color:#a66bf5;">Stage 4</div>
+        <div class="stage-name">Option Generation</div>
+        <div class="stage-desc">Systematically producing strategic options from the SWOT picture</div>
+      </div>
+      <div class="stage-content">
+        <div class="framework-card theme-generation" id="card-tows" onmouseenter="showDetail(event, 'tows')" onmousemove="positionTooltip(event)" onmouseleave="hideTooltip()">
+          <div class="card-header">
+            <div class="card-icon" style="background:#a66bf5;">T</div>
+            <div>
+              <div class="card-title">TOWS Matrix</div>
+              <div class="card-subtitle">Turning the SWOT picture into strategic options</div>
+            </div>
+          </div>
+          <div class="card-body">
+            In the Blue Ocean variant, Stage 4 is the <em>value-curve divergence</em> step — testing whether the value innovation is defensible, scalable, and self-reinforcing. The TOWS grid is used to check that the eliminate/reduce/raise/create choices produce a coherent business model rather than a collection of aesthetic gestures. Cirque's four cells reinforced each other: the premium positioning funded the production values, which justified the premium ticket prices, which funded the next production.
+          </div>
+          <div class="tows-grid" id="tows-grid">
+            <div class="tows-cell tows-header" style="border-right:1px solid rgba(196,163,90,0.08);"></div>
+            <div class="tows-cell tows-header">Opportunities</div>
+            <div class="tows-cell tows-header">Threats</div>
+
+            <div class="tows-cell tows-row-header">Strengths</div>
+            <div class="tows-cell" data-combo="so" onclick="highlightTows('so')">
+              <strong style="color:#a66bf5;">SO — Theatrical circus as a new art form</strong><br>
+              <span style="font-size:11px; color:#888;">Street-performance creative network (S) × adult non-customers of traditional circus + appetite for novel premium entertainment (O). Create a new performing-arts category positioned between circus, theatre and ballet.</span><br>
+              <em style="font-size:11px; color:#666;">Maxi-Maxi</em>
+            </div>
+            <div class="tows-cell" data-combo="st" onclick="highlightTows('st')">
+              <strong style="color:#a66bf5;">ST — Refuse head-to-head competition with traditional circus</strong><br>
+              <span style="font-size:11px; color:#888;">Creative flexibility + absence of legacy infrastructure (S) × animal-welfare protest risk + declining traditional circus audiences (T). Build in non-overlap markets (resident Las Vegas shows, international touring to new venues). Never directly compete with Ringling Brothers in their own venues.</span><br>
+              <em style="font-size:11px; color:#666;">Maxi-Mini</em>
+            </div>
+
+            <div class="tows-cell tows-row-header">Weaknesses</div>
+            <div class="tows-cell" data-combo="wo" onclick="highlightTows('wo')">
+              <strong style="color:#a66bf5;">WO — Hire from theatre, not from circus</strong><br>
+              <span style="font-size:11px; color:#888;">Lack of traditional circus expertise (W) × adult-market opportunity (O). Recruit theatrical directors, choreographers, composers and costume designers rather than circus veterans. Invest in in-house creative studios in Montréal rather than poaching industry talent.</span><br>
+              <em style="font-size:11px; color:#666;">Mini-Maxi</em>
+            </div>
+            <div class="tows-cell" data-combo="wt" onclick="highlightTows('wt')">
+              <strong style="color:#a66bf5;">WT — Asset-light venue strategy</strong><br>
+              <span style="font-size:11px; color:#888;">No capital to own venues (W) × high fixed-cost risk in the performing-arts business (T). Never own arenas. Use the big-top tent for touring; co-invest with casino operators for Las Vegas residencies (starting with Mystère at Treasure Island, 1993); licence productions rather than owning distribution.</span><br>
+              <em style="font-size:11px; color:#666;">Mini-Mini (defensive)</em>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════ CONNECTOR: TOWS → Recommendations ════ -->
+    <div class="connector-zone">
+      <div class="stage-label"></div>
+      <div class="arrow-group">
+        <div class="flow-arrow" id="arrow-tows-recs">
+          <div class="flow-arrow-label">Strategic options are prioritised, evaluated,<br>and refined into recommendations</div>
+          <svg width="220" height="36" viewBox="0 0 220 36">
+            <defs>
+              <marker id="ah4" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+                <path d="M0,0 L8,3 L0,6 Z" fill="#e05555"/>
+              </marker>
+            </defs>
+            <path d="M20,18 L200,18" stroke="#e05555" stroke-width="2" fill="none" marker-end="url(#ah4)" stroke-dasharray="6,4" class="flow-pulse"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════ STAGE 5: Recommendations ════ -->
+    <div class="stage-row" id="stage-5">
+      <div class="stage-label">
+        <div class="step-dot" style="background:#e05555; top: 30px;"></div>
+        <div class="stage-num" style="color:#e05555;">Stage 5</div>
+        <div class="stage-name">Recommendations</div>
+        <div class="stage-desc">Evidence-based strategic recommendations with clear lineage</div>
+      </div>
+      <div class="stage-content">
+        <div class="framework-card theme-output" id="card-recs" onmouseenter="showDetail(event, 'recs')" onmousemove="positionTooltip(event)" onmouseleave="hideTooltip()">
+          <div class="card-header">
+            <div class="card-icon" style="background:#e05555;">R</div>
+            <div>
+              <div class="card-title">Strategic Recommendations</div>
+              <div class="card-subtitle">The output of the entire synthesis chain</div>
+            </div>
+          </div>
+          <div class="card-body">
+            The output of Cirque's synthesis chain was a multi-decade programme of production launches, each reinforcing the value curve: <em>Nouvelle Expérience</em> (1990) as the first breakthrough show, the Mystère Las Vegas residency (1993) as the financial anchor, and a cadence of new productions — <em>Saltimbanco</em>, <em>Alegría</em>, <em>O</em>, <em>Dralion</em>, <em>KÀ</em>, <em>LOVE</em> — each exploring a different theme under the same value-innovation logic. By 2004 Cirque had eight productions running simultaneously, roughly half as resident Vegas shows and half as international tours, with annual revenues over C$600m.
+          </div>
+          <div class="data-pills">
+            <span class="pill" style="background:rgba(166,107,245,0.08); color:#a66bf5;">SO → Launch a cadence of thematic productions</span>
+            <span class="pill" style="background:rgba(166,107,245,0.08); color:#a66bf5;">ST → Resident Vegas shows + international touring</span>
+            <span class="pill" style="background:rgba(166,107,245,0.08); color:#a66bf5;">WO → In-house Montréal creative studios</span>
+            <span class="pill" style="background:rgba(166,107,245,0.08); color:#a66bf5;">WT → Co-invested or licensed venues (asset-light)</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /flow -->
+
+  <!-- ════ Traceability example ════ -->
+  <div style="margin-top: 50px; padding: 28px; background: rgba(196,163,90,0.03); border: 1px solid rgba(196,163,90,0.12); border-radius: 14px;">
+    <div style="font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: #C4A35A; margin-bottom: 12px;">Traceability Example</div>
+    <div style="font-family: 'Georgia', serif; font-size: 17px; color: #1a1a1a; margin-bottom: 14px;">How a single recommendation traces back to raw data</div>
+
+    <div id="trace-chain" style="display: flex; align-items: flex-start; gap: 0; flex-wrap: wrap;">
+
+      <div class="trace-step" style="flex: 1; min-width: 180px; padding: 14px; background: rgba(91,138,245,0.04); border-radius: 10px; border: 1px solid rgba(91,138,245,0.12); cursor:pointer;" onmouseenter="traceHighlight(1)" onmouseleave="traceClear()">
+        <div style="font-size: 10px; font-weight: 700; color: #5b8af5; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px;">Demand-side finding</div>
+        <div style="font-size: 12.5px; color: #444; line-height: 1.5;">Parents taking children to traditional circus wanted something for <em>themselves</em>; adult theatre-goers in urban centres had disposable income but limited novel live-entertainment options</div>
+      </div>
+
+      <div style="display:flex; align-items:center; padding: 0 6px; color: #ccc; font-size: 20px;">&#8594;</div>
+
+      <div class="trace-step" style="flex: 1; min-width: 180px; padding: 14px; background: rgba(245,155,66,0.04); border-radius: 10px; border: 1px solid rgba(245,155,66,0.12); cursor:pointer;" onmouseenter="traceHighlight(2)" onmouseleave="traceClear()">
+        <div style="font-size: 10px; font-weight: 700; color: #f59b42; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px;">Enters value map as</div>
+        <div style="font-size: 12.5px; color: #444; line-height: 1.5;"><strong>Create:</strong> An adult-targeted live performing-arts category positioned between circus, theatre and ballet — a category that did not exist and therefore had no direct competitors</div>
+      </div>
+
+      <div style="display:flex; align-items:center; padding: 0 6px; color: #ccc; font-size: 20px;">&#8594;</div>
+
+      <div class="trace-step" style="flex: 1; min-width: 180px; padding: 14px; background: rgba(166,107,245,0.04); border-radius: 10px; border: 1px solid rgba(166,107,245,0.12); cursor:pointer;" onmouseenter="traceHighlight(3)" onmouseleave="traceClear()">
+        <div style="font-size: 10px; font-weight: 700; color: #a66bf5; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px;">Value-curve crosses with</div>
+        <div style="font-size: 12.5px; color: #444; line-height: 1.5;"><strong>Capability</strong> (from value-chain audit): Québec street-performance creative network + in-house Montréal studios = <strong>SO Strategy</strong> — theatrical circus as a new art form, premium-priced, adult-targeted</div>
+      </div>
+
+      <div style="display:flex; align-items:center; padding: 0 6px; color: #ccc; font-size: 20px;">&#8594;</div>
+
+      <div class="trace-step" style="flex: 1; min-width: 180px; padding: 14px; background: rgba(224,85,85,0.04); border-radius: 10px; border: 1px solid rgba(224,85,85,0.12); cursor:pointer;" onmouseenter="traceHighlight(4)" onmouseleave="traceClear()">
+        <div style="font-size: 10px; font-weight: 700; color: #e05555; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px;">Recommendation</div>
+        <div style="font-size: 12.5px; color: #444; line-height: 1.5;">Launch <em>Mystère</em> (1993) as a resident production at Treasure Island Hotel, Las Vegas — the first permanent Cirque show, co-invested with the casino, becoming the financial anchor for the touring portfolio and the template for a decade of further resident shows (<em>O</em>, <em>KÀ</em>, <em>LOVE</em>, <em>Michael Jackson ONE</em>)</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ════ Key insight ════ -->
+  <div style="margin-top: 30px; padding: 24px 28px; background: rgba(196,163,90,0.05); border-left: 3px solid #C4A35A; border-radius: 0 10px 10px 0;">
+    <div style="font-family: 'Georgia', serif; font-size: 15px; color: #1a1a1a; margin-bottom: 6px;">The Synthesis Principle — Divergence is a System, Not a Gesture</div>
+    <div style="font-size: 13px; color: #555; line-height: 1.65;">
+      The defining feature of Cirque's Blue Ocean synthesis is that the eliminate/reduce/raise/create choices reinforced each other as a <em>system</em>. Eliminating animals was not just an ethical or aesthetic choice — it removed the single biggest legacy cost in the traditional circus model (animal handlers, veterinary costs, welfare compliance, transport, protest risk) and freed capital for the theatrical production values that justified the premium ticket prices. Raising those production values attracted the adult audience. Refusing star performers removed the pricing power that had hollowed out traditional circus economics, and let Cirque reinvest the savings in brand, costume design and music. Each move depended on every other move. <em>This is what value innovation means in practice: differentiation and lower cost simultaneously, through a tightly coupled set of strategic choices rather than a single clever move.</em>
+      <br><br>
+      The governance lesson: the synthesis chain reveals the interlock. A board reviewing a Blue Ocean proposal should not ask "is this innovative?" — it should ask "do the eliminate/reduce/raise/create choices reinforce each other, or is this a collection of marketing gestures?". Cirque's early years pass that test. Many imitators do not.
+      <br><br>
+      A Level 7 honest reading has to note the limits. First, Cirque benefited from environmental conditions it did not create: Québec's cultural funding in the 1980s, the collapse of traditional circus in the 1990s, and Las Vegas reinventing itself as a family-and-adult entertainment destination in the mid-1990s. Second, the value-innovation logic has a shelf life. Cirque's post-2008 phase under private-equity ownership (TPG and later the Caisse de dépôt et placement du Québec) was characterised by aggressive licensing, acquisitions of companies including The Works Entertainment and VStar, and a shift toward conventional growth-through-acquisition logic — which gradually sailed the company back into red water and contributed, alongside COVID, to the 2020 bankruptcy filing. The company has since been restructured under new owners and has reopened most of its core productions, but the case offers a cautionary second teaching point: <strong>value-innovation strategies are not permanent moats</strong>. They are durable only for as long as the originating strategic logic is still being protected against the pull of conventional growth imperatives.
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+<!-- ════ Floating tooltip ════ -->
+<div id="tooltip"></div>
+
+<script>
+const details = {
+  pestel: {
+    badge: { label: 'Stage 1 — Demand-Side Scan (Cirque du Soleil, 1984)', bg: 'rgba(91,138,245,0.1)', color: '#5b8af5' },
+    title: 'Demand-Side Scan — Finding the Non-Customers',
+    purpose: 'The Blue Ocean variant of the synthesis chain reframes Stage 1 as a demand-side scan. Instead of scanning the six PESTEL dimensions for macro tailwinds and threats, it scans for <em>non-customers</em> — people whom the industry no longer serves, refuses to serve, or has never considered serving. For Cirque, the non-customer analysis was more consequential than any traditional environmental scan could have been, because the traditional circus industry had been progressively shrinking its own addressable market for fifty years.',
+    sections: [
+      {
+        title: 'The three tiers of non-customers Cirque identified',
+        items: [
+          { color: '#5b8af5', html: '<strong>Tier 1 — Soon-to-be-former customers.</strong> Adults who had taken their own children to traditional circus in the 1970s but were losing interest themselves. They still attended, but only out of parental obligation, and the repeat-visit rate was collapsing. The industry assumed this tier would always regenerate through the next generation of children. It did not.' },
+          { color: '#5b8af5', html: '<strong>Tier 2 — Refusing customers.</strong> Urban adults who actively refused to attend circus on ethical grounds (animal welfare, human stunt safety, the perceived "lowbrow" positioning) or aesthetic grounds (too noisy, too crude, too child-oriented). These customers were going to theatre, ballet and opera instead — often paying substantially higher ticket prices.' },
+          { color: '#5b8af5', html: '<strong>Tier 3 — Unexplored customers.</strong> Adult corporate and private-event buyers who had never considered circus as a venue option. They were booking theatrical venues, hotels and bespoke entertainment for weddings, product launches and corporate hospitality. Nobody in the circus industry was marketing to them.' },
+          { color: '#5b8af5', html: '<strong>The macro context</strong> — declining traditional circus audiences throughout North America and Europe since the 1950s; ascendant animal-welfare politics (the first major protests against Ringling Brothers elephant acts were already in the news in the 1980s); Québec cultural-support funding for francophone artistic projects; Las Vegas beginning its transition from adults-only gambling town to family-and-adult entertainment destination (Treasure Island, 1993; Bellagio, 1998).' },
+          { color: '#f59b42', html: '<strong>The macro threat</strong> — the same forces closing traditional circus were structural, not cyclical. A new entrant trying to recapture the children-plus-parents audience would be fighting a declining market. A new entrant creating an <em>adult</em> live-entertainment category would be opening an uncontested market.' },
+        ]
+      },
+      {
+        title: 'How the scan connected forward',
+        note: 'The demand-side scan did not produce a neat list of opportunities and threats. It produced a single insight: there were three tiers of non-customers the industry was ignoring, and all three could be captured simultaneously if the product was redesigned from scratch rather than incrementally improved. That insight flows directly into the value-chain audit in Stage 2 — because capturing those non-customers required eliminating almost everything the traditional circus industry considered essential. A conventional PESTEL scan would have missed this entirely: none of the six dimensions, read in isolation, would have surfaced "the industry has been shrinking its own market" as a finding.'
+      }
+    ]
+  },
+  vrio: {
+    badge: { label: 'Stage 2 — Value-Chain Audit (Cirque du Soleil, 1984–1990)', bg: 'rgba(66,219,165,0.1)', color: '#42dba5' },
+    title: 'Value-Chain Audit — What to Keep, What to Eliminate',
+    purpose: 'The Blue Ocean variant replaces the VRIO test with a value-chain audit. The question is not "which of our capabilities are rare and inimitable?" — Cirque did not have rare or inimitable capabilities in 1984, it had a grant from the Québec government and a group of street performers. The question is: <em>which elements of the traditional circus value chain are worth keeping, which are worth reducing, and which should be eliminated entirely to free capital for new elements that create buyer value?</em> The audit is designed to make the eliminate decisions as crisp and as brave as possible, because value innovation depends on the willingness to cut deep into what the industry treats as sacred.',
+    sections: [
+      {
+        title: 'What the audit found worth keeping (strengths)',
+        items: [
+          { color: '#42dba5', html: '<strong>Québec street-performance network</strong> — Laliberté and co-founder Gilles Ste-Croix were part of a dense creative community of acrobats, jugglers, fire-breathers, stilt-walkers and musicians in Baie-Saint-Paul. Not "rare" in a strict VRIO sense, but genuinely differentiated as a talent pool because nobody in the traditional circus industry was recruiting from street performance.' },
+          { color: '#42dba5', html: '<strong>Absence of legacy infrastructure</strong> — Cirque had no animals, no ring masters, no inherited big-top traditions, no family dynasties to appease. In a traditional circus company this would have been a weakness. In a blue-ocean context it was a strategic asset: it meant nothing had to be gradually reformed, only assembled from scratch in the right configuration.' },
+          { color: '#42dba5', html: '<strong>Québec cultural-support funding</strong> — the province subsidised francophone artistic projects, and the 1984 Canada 450th-anniversary grant was the initial capital. Not a sustained competitive advantage, but the bridge that got Cirque through the first years when the business model was still being proven.' },
+          { color: '#42dba5', html: '<strong>Montréal as a production base</strong> — low labour and real-estate costs relative to New York or Las Vegas, deep theatrical talent pool (reinforced later by the in-house creative studios opened in 1997 at the purpose-built International Headquarters in Saint-Michel), and a bilingual cultural environment that translated naturally to both anglophone and francophone markets.' },
+        ]
+      },
+      {
+        title: 'What the audit found worth eliminating',
+        items: [
+          { color: '#e05555', html: '<strong>Animals.</strong> The single biggest cost centre in the traditional circus model — animal handlers, veterinary staff, transport cages, insurance, welfare compliance, and the rising reputational and protest risk. Eliminating animals did not merely remove cost; it removed an entire category of operational complexity and freed capital for theatrical production values.' },
+          { color: '#e05555', html: '<strong>Star performers.</strong> Traditional circuses paid premium fees for named aerialists and clowns who had pricing power. Cirque chose to make <em>the production</em> the star — not any individual performer — so that no single departure could damage the franchise. This was unpopular with circus unions for years, but it was essential to the economic model.' },
+          { color: '#e05555', html: '<strong>Three-ring parallel staging.</strong> Traditional circuses had three simultaneous performance rings (and three acts happening at once) precisely because no single act could hold an audience\'s attention. Cirque unified attention on a single stage with a coherent narrative — eliminating the hardware, the complexity, and the implicit admission that individual acts were not strong enough to stand on their own.' },
+          { color: '#e05555', html: '<strong>Aisle concessions and sideshows.</strong> The traditional circus revenue model depended heavily on concessions and low-margin extras. Cirque eliminated these entirely, repositioning the show itself as the product and the ticket price as the full value exchange — which also reinforced the premium positioning.' },
+        ]
+      },
+      {
+        title: 'How the audit connected forward',
+        note: 'The Blue Ocean insight is that eliminating costs and raising buyer value are <em>not a trade-off</em>. Cirque\'s eliminate column freed the capital that funded the raise and create columns in Stage 3. A traditional cost-leadership move would have cut costs while also cutting quality; a traditional differentiation move would have raised quality while also raising costs. Value innovation does both simultaneously because the eliminate decisions are aimed at industry conventions that generate cost without generating buyer value. That is the test the audit has to pass: <em>does the eliminate column target things customers did not actually want in the first place?</em>'
+      }
+    ]
+  },
+  swot: {
+    badge: { label: 'Stage 3 — Value Innovation Map (Cirque du Soleil, 1984–1990)', bg: 'rgba(245,155,66,0.1)', color: '#f59b42' },
+    title: 'Value Innovation Map — The ERRC Grid',
+    purpose: 'Stage 3 in the Blue Ocean variant is the <em>value innovation map</em>. It replaces SWOT with the Eliminate–Reduce–Raise–Create (ERRC) grid — a deliberately action-oriented framework that forces the team to name concrete choices rather than list abstract strengths and weaknesses. The key test at this stage is the <em>value curve</em>: plotted against the industry benchmark, does the resulting offering diverge sharply from the standard industry profile, or does it merely tweak it? Cirque\'s value curve is the canonical example taught in every Blue Ocean module because it diverges on almost every dimension at once.',
+    sections: [
+      {
+        title: 'The ERRC grid applied to circus',
+        items: [
+          { color: '#e05555', html: '<strong>ELIMINATE</strong> — Animal acts (entirely). Star performers and the premium fees they commanded. Three-ring staging and the implicit "nothing here is strong enough on its own" message. Aisle concessions and sideshows. The children-centric marketing identity.' },
+          { color: '#f59b42', html: '<strong>REDUCE</strong> — Thrill-and-danger set-pieces (kept, but integrated into narrative rather than standing as stand-alone spectacles). Physical stunts treated as pure athletic feats (reframed as part of a character arc instead). Breadth of market positioning (deliberately narrowed to premium).' },
+          { color: '#42dba5', html: '<strong>RAISE</strong> — Venue aesthetics and production values to theatre-premium standards. Ticket prices (from traditional-circus budget pricing into theatre-premium range, $60–$150+ rather than $15–$30). Artistic music, live orchestration and original composition. Costume design and stage lighting. Adult appeal in tone, theme and content.' },
+          { color: '#5b8af5', html: '<strong>CREATE</strong> — A coherent theatrical theme and storyline per production, each with its own creative universe. Original composed music and signature costume design as ownable assets. Resident Las Vegas productions co-invested with casino operators. Multiple simultaneous touring shows under a single brand. A dedicated corporate and private-event booking channel. A Montréal creative studio system that institutionalised the production pipeline.' },
+        ]
+      },
+      {
+        title: 'Why the value curve mattered',
+        note: 'Plotted on the value canvas — ticket price, production value, humour, animal acts, star performers, unique theme, artistic music, danger, atmospheric venue — Cirque\'s curve is high on every dimension the industry was low on, and low on every dimension the industry was high on. <em>Perfect divergence.</em> This is the test the ERRC has to pass: a Blue Ocean strategy should produce a value curve that looks visibly unlike the industry benchmark, not a curve that runs slightly above it. If the proposed curve is a parallel shift, the team is still in the red ocean.'
+      }
+    ]
+  },
+  tows: {
+    badge: { label: 'Stage 4 — Value-Curve Divergence (Cirque du Soleil, 1984–1990)', bg: 'rgba(166,107,245,0.1)', color: '#a66bf5' },
+    title: 'Value-Curve Divergence — Testing the System',
+    purpose: 'Stage 4 in the Blue Ocean variant takes the ERRC grid from Stage 3 and tests whether the resulting value curve actually holds together as a business model. The TOWS matrix is used here not to generate options but to stress-test the value innovation against the traditional industry position — asking whether the eliminate, reduce, raise and create choices produce a coherent, self-reinforcing system or a collection of aesthetic gestures that the existing industry could absorb.',
+    sections: [
+      {
+        title: 'The four Cirque strategies, read through the Blue Ocean lens',
+        items: [
+          { color: '#a66bf5', html: '<strong>SO (Maxi-Maxi) — Theatrical circus as a new art form.</strong> Street-performance creative network + absence of legacy infrastructure (S) × adult non-customers + premium-entertainment appetite (O). Launch <em>Le Cirque Réinventé</em> (1987) into the Los Angeles Arts Festival as the first major adult positioning; follow with <em>Nouvelle Expérience</em> (1990) as the first production designed from the ground up as theatrical circus; anchor the model in premium-price touring with the big-top tent as the mobile venue.' },
+          { color: '#a66bf5', html: '<strong>ST (Maxi-Mini) — Refuse direct competition with traditional circus.</strong> Creative flexibility + no inherited distribution (S) × animal-welfare protest risk + declining traditional circus audiences (T). Never book the same venues as Ringling Brothers; never compete for the same calendar slots; never market to children as the primary audience. Build in non-overlap markets — starting with Vancouver Expo 86, then the 1987 Los Angeles Arts Festival, then the Mystère Las Vegas residency at Treasure Island (1993) — each of which was adjacent to the traditional circus market rather than inside it.' },
+          { color: '#a66bf5', html: '<strong>WO (Mini-Maxi) — Hire from theatre, not from circus.</strong> Lack of traditional circus expertise (W) × adult-market opportunity (O). Recruit theatrical directors (Franco Dragone joined in 1987), choreographers, composers (the partnership with composer Benoît Jutras and later René Dupéré defined the Cirque sound), and costume designers from outside the circus industry. Build in-house creative studios in Montréal (the Saint-Michel International Headquarters opened in 1997) rather than poaching from existing circus families — deliberately rejecting the industry\'s talent network.' },
+          { color: '#a66bf5', html: '<strong>WT (Mini-Mini) — Asset-light venue strategy.</strong> No capital to own venues (W) × high fixed-cost risk in the performing-arts business (T). Never own arenas. Use the big-top tent for touring (flexible, mobile, capital-light); co-invest with casino operators for Las Vegas residencies (Mystère at Treasure Island 1993 was the founding deal; O at Bellagio 1998 scaled the model); license productions for specific regions rather than directly operating globally. Casinos supply the venue and a guaranteed audience; Cirque supplies the show. The capital risk is asymmetric in Cirque\'s favour.' },
+        ]
+      },
+      {
+        title: 'Why this TOWS mattered',
+        note: 'The teaching point is that the four cells <em>reinforce</em> each other rather than competing for resources. SO (theatrical positioning) justifies premium prices; premium prices fund the production values from the ERRC "raise" column; the production values attract the adult audience in ST; the adult audience makes the casino co-investment model in WT viable; the casino cash flows fund the Montréal creative studios in WO, which produce the next wave of theatrical shows that feed SO again. A Blue Ocean strategy fails when the four cells do not reinforce each other — when, for example, the "create" investments cannot be paid for by the "eliminate" savings. The test is not "are these clever ideas?" but "does the system fund itself?" Cirque\'s did, for roughly twenty years. <em>The post-2008 private-equity-owned phase is a separate case study in what happens when the discipline of value-innovation logic is gradually replaced by conventional growth-through-acquisition logic.</em>'
+      }
+    ]
+  },
+  recs: {
+    badge: { label: 'Stage 5 — Output (Cirque du Soleil, 1984–2004 and after)', bg: 'rgba(224,85,85,0.1)', color: '#e05555' },
+    title: 'Strategic Recommendations — A Twenty-Year Production Cadence',
+    purpose: 'The output of Cirque\'s Blue Ocean synthesis was not a single strategic plan but a multi-decade production cadence. Each new show was tested against the value curve established at the start — does it preserve the divergence from traditional circus, or is it drifting back toward the industry norm? — and each production in turn funded the next. The business model was self-financing by design, because the ERRC grid in Stage 2 had freed enough capital through elimination to pay for the creation agenda.',
+    sections: [
+      {
+        title: 'The recommendations and their ERRC lineage',
+        items: [
+          { color: '#e05555', html: '<strong>1. Launch a cadence of theatrically themed touring productions (SO).</strong> Starting with <em>Nouvelle Expérience</em> (1990) as the first breakthrough show, followed by <em>Saltimbanco</em> (1992), <em>Alegría</em> (1994), <em>Quidam</em> (1996), <em>Dralion</em> (1999) and <em>Varekai</em> (2002). Each production had its own theme, music, costumes and narrative universe — but all shared the same value curve. Touring shows travelled under the big-top "Grand Chapiteau" tent, which functioned as the venue and the brand marker simultaneously.' },
+          { color: '#e05555', html: '<strong>2. Anchor the business with resident Las Vegas productions (ST + financial stability).</strong> <em>Mystère</em> at Treasure Island (1993) was the founding deal — a ten-year residency co-invested with the casino, guaranteeing Cirque a steady cashflow while the casino got a marquee attraction. <em>O</em> at Bellagio (1998) scaled the model into a purpose-built aquatic theatre. <em>KÀ</em> at MGM Grand (2004), <em>LOVE</em> at the Mirage (2006, in partnership with the Beatles\' estate), <em>Michael Jackson ONE</em> at Mandalay Bay (2013). The residencies became the financial backbone that allowed the touring shows to take creative risks.' },
+          { color: '#e05555', html: '<strong>3. Institutionalise the creative pipeline (WO).</strong> The International Headquarters complex opened in Saint-Michel, Montréal in 1997 — a purpose-built creative studio containing rehearsal spaces, costume workshops, a technical design studio and housing for resident performers during production development. This turned the production pipeline from a cottage industry into an industrial creative process, and it kept the creative IP in-house rather than dispersed across freelance contributors.' },
+          { color: '#e05555', html: '<strong>4. Refuse venue ownership (WT).</strong> Cirque never owned the venues for its resident shows — the casinos invested the capital to build the theatres in exchange for the ongoing revenue share. Cirque never owned the tent production sites either. This kept the company asset-light through its entire growth phase and meant that venue-level financial risk sat with the casino partners. The touring shows had a similar logic: Cirque provided the creative and performance IP; local promoters handled venue economics.' },
+          { color: '#e05555', html: '<strong>5. License and partner selectively, not aggressively.</strong> In the 1984–2004 phase Cirque said no to most licensing opportunities. The brand was protected by scarcity. This discipline reinforced the premium positioning and kept the value curve intact. It was also the discipline that eroded most visibly in the post-2008 phase, as we note below.' },
+        ]
+      },
+      {
+        title: 'The result — and the open questions that a Level 7 reading has to name',
+        note: 'By 2004 Cirque was producing annual revenues over C$600m with eight productions running simultaneously. By 2015 it had played to more than 150 million spectators across 450+ cities. By almost any measure the Blue Ocean synthesis worked extraordinarily well for its first twenty years. But a Level 7 honest reading has to name three things. (1) <em>The environment mattered.</em> Québec cultural funding in the early years, the collapse of traditional circus in the 1990s, the Las Vegas reinvention as a family-and-adult entertainment destination — none of these were created by Cirque\'s management. (2) <em>The value-innovation discipline had a shelf life.</em> The post-2008 phase under TPG Capital (majority shareholder from 2015) and the Caisse de dépôt et placement du Québec shifted the company toward aggressive licensing, acquisitions of adjacent entertainment businesses (The Works Entertainment 2017, VStar Entertainment 2018), a shift toward quarterly financial reporting discipline, and eventually the COVID-era 2020 bankruptcy filing. The original value-innovation logic was still present in individual productions, but the operating model increasingly looked like a conventional growth-through-acquisition entertainment conglomerate. The company was reorganised in 2020–21 under new ownership and has since reopened its core shows. (3) <em>This is not a failure of Blue Ocean theory</em> — it is a reminder that Blue Ocean strategies are durable only for as long as the originating strategic logic is still being actively protected. The moment the governance model shifts to conventional growth-through-M&amp;A logic, the value-curve discipline erodes. A board reviewing a Blue Ocean strategy has two jobs: validate the initial value innovation <em>and</em> build governance protection against the long-run drift back into red water. Most boards do the first and not the second. Cirque is the canonical example of why the second job matters.'
+      }
+    ]
+  }
+};
+
+const tooltip = document.getElementById('tooltip');
+
+function showDetail(e, id) {
+  const d = details[id];
+
+  let html = `
+    <div class="detail-badge" style="background:${d.badge.bg}; color:${d.badge.color}">${d.badge.label}</div>
+    <div class="detail-title">${d.title}</div>
+    <div class="detail-purpose">${d.purpose}</div>
+  `;
+
+  d.sections.forEach(s => {
+    html += `<div class="detail-section-title">${s.title}</div>`;
+    if (s.items) {
+      s.items.forEach(item => {
+        html += `<div class="output-item"><div class="output-dot" style="background:${item.color}"></div><div class="output-text">${item.html}</div></div>`;
+      });
+    }
+    if (s.note) {
+      html += `<div class="synthesis-note"><p>${s.note}</p></div>`;
+    }
+  });
+
+  tooltip.innerHTML = html;
+  tooltip.style.display = 'block';
+  positionTooltip(e);
+
+  // Highlight corresponding card
+  document.querySelectorAll('.framework-card').forEach(c => c.classList.remove('active'));
+  document.getElementById('card-' + id)?.classList.add('active');
+}
+
+function positionTooltip(e) {
+  const W = window.innerWidth;
+  const H = window.innerHeight;
+  const rect = tooltip.getBoundingClientRect();
+  let x = e.clientX + 15;
+  let y = e.clientY + 15;
+  if (x + rect.width + 10 > W) x = e.clientX - rect.width - 15;
+  if (y + rect.height + 10 > H) y = e.clientY - rect.height - 15;
+  if (x < 10) x = 10;
+  if (y < 10) y = 10;
+  tooltip.style.left = x + 'px';
+  tooltip.style.top = y + 'px';
+}
+
+function hideTooltip() {
+  tooltip.style.display = 'none';
+  document.querySelectorAll('.framework-card').forEach(c => c.classList.remove('active'));
+}
+
+// TOWS cell highlight
+function highlightTows(combo) {
+  document.querySelectorAll('.tows-cell[data-combo]').forEach(c => c.classList.remove('active-cell'));
+  const cell = document.querySelector(`.tows-cell[data-combo="${combo}"]`);
+  if (cell) cell.classList.add('active-cell');
+
+  // Highlight related SWOT cells
+  const swotMap = {
+    so: ['s', 'o'], st: ['s', 't'], wo: ['w', 'o'], wt: ['w', 't']
+  };
+  document.querySelectorAll('.swot-cell').forEach(c => c.classList.remove('highlight'));
+  (swotMap[combo] || []).forEach(q => {
+    document.querySelector(`.swot-cell.${q}`)?.classList.add('highlight');
+  });
+}
+
+// Trace example hover
+function traceHighlight(step) {
+  const steps = document.querySelectorAll('.trace-step');
+  steps.forEach((s, i) => {
+    if (i < step) {
+      s.style.transform = 'scale(1.02)';
+      s.style.boxShadow = '0 2px 12px rgba(196,163,90,0.15)';
+    } else {
+      s.style.transform = '';
+      s.style.boxShadow = '';
+    }
+  });
+}
+
+function traceClear() {
+  document.querySelectorAll('.trace-step').forEach(s => {
+    s.style.transform = '';
+    s.style.boxShadow = '';
+  });
+}
+
+// Close tooltip on Escape
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') hideTooltip();
+});
+</script>
+
+</body>
+</html>
