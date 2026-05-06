@@ -178,16 +178,16 @@
   <div class="header-divider"></div>
   <div class="header-text">
     <h1>Strategy Framework Relationship Map</h1>
-    <p>MSc Corporate Governance — Click a framework to explore connections</p>
+    <p>Click a framework to explore connections</p>
   </div>
 </div>
 
 <div id="controls">
-  <button class="ctrl-btn" onclick="filterPhase(0)">All</button>
-  <button class="ctrl-btn" onclick="filterPhase(1)">Phase 1 — Core</button>
-  <button class="ctrl-btn" onclick="filterPhase(2)">Phase 2 — Applied</button>
-  <button class="ctrl-btn" onclick="filterPhase(3)">Phase 3 — Culture &amp; Change</button>
-  <button class="ctrl-btn" onclick="filterPhase(4)">Phase 4 — Completing</button>
+  <button class="ctrl-btn" onclick="filterStage('all')">All</button>
+  <button class="ctrl-btn" onclick="filterStage('context')">Context</button>
+  <button class="ctrl-btn" onclick="filterStage('analysis')">Analysis</button>
+  <button class="ctrl-btn" onclick="filterStage('synthesis')">Synthesis</button>
+  <button class="ctrl-btn" onclick="filterStage('implementation')">Implementation</button>
 </div>
 
 <svg id="canvas"></svg>
@@ -195,11 +195,11 @@
 <div id="tooltip"></div>
 
 <div id="legend">
-  <h4>Phase</h4>
-  <div class="legend-item"><div class="legend-dot" style="background:#5b8af5"></div>Phase 1 — Core</div>
-  <div class="legend-item"><div class="legend-dot" style="background:#f59b42"></div>Phase 2 — Applied</div>
-  <div class="legend-item"><div class="legend-dot" style="background:#a66bf5"></div>Phase 3 — Culture &amp; Change</div>
-  <div class="legend-item"><div class="legend-dot" style="background:#42dba5"></div>Phase 4 — Completing</div>
+  <h4>Stage</h4>
+  <div class="legend-item"><div class="legend-dot" style="background:#5b8af5"></div>Context</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#f59b42"></div>Analysis</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#42dba5"></div>Synthesis</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#a66bf5"></div>Implementation</div>
 </div>
 
 <div id="rel-legend">
@@ -220,8 +220,10 @@
 
 <script>
 // ── DATA ──
-const phaseColors = {1:'#5b8af5', 2:'#f59b42', 3:'#a66bf5', 4:'#42dba5'};
-const phaseNames = {1:'Phase 1 — Core', 2:'Phase 2 — Applied', 3:'Phase 3 — Culture & Change', 4:'Phase 4 — Completing'};
+const stageColors = {context:'#5b8af5', analysis:'#f59b42', synthesis:'#42dba5', implementation:'#a66bf5'};
+const stageNames  = {context:'Context', analysis:'Analysis', synthesis:'Synthesis', implementation:'Implementation'};
+const stageInitial = {context:'C', analysis:'A', synthesis:'S', implementation:'I'};
+const stageOrder  = ['context','analysis','synthesis','implementation'];
 
 // Much more vivid, distinct colours
 const relColors = {
@@ -231,84 +233,121 @@ const relColors = {
 };
 
 const frameworks = [
-  {id:'freeman', label:"Freeman's\nStakeholder Theory", short:'Freeman', phase:1,
+  // ── CONTEXT — governance, stakeholder, purpose worldview ──
+  {id:'freeman', label:"Freeman's\nStakeholder Theory", short:'Freeman', stage:'context',
     purpose:'Identifies who an organisation\'s stakeholders are and argues they all have legitimate claims — the foundation for stakeholder thinking.',
     cluster:'stakeholder'},
-  {id:'mendelow', label:"Mendelow's\nStakeholder Matrix", short:'Mendelow', phase:1,
+  {id:'mendelow', label:"Mendelow's\nStakeholder Matrix", short:'Mendelow', stage:'context',
     purpose:'Maps stakeholders by power and interest to prioritise engagement strategy. Dynamic — stakeholders move quadrants over time.',
     cluster:'stakeholder'},
-  {id:'agency', label:"Agency vs.\nStewardship Theory", short:'Agency/Stewardship', phase:1,
+  {id:'mitchell', label:"Mitchell, Agle\n& Wood Salience", short:'Stakeholder Salience', stage:'context',
+    purpose:'Classifies stakeholders by three attributes — Power, Legitimacy, Urgency — yielding seven types from latent to definitive. Refines Freeman/Mendelow with a richer salience test for management attention.',
+    cluster:'stakeholder'},
+  {id:'agency', label:"Agency vs.\nStewardship Theory", short:'Agency/Stewardship', stage:'context',
     purpose:'Two competing views of the manager-owner relationship: self-interest requiring controls (Agency) vs. intrinsic motivation enabling trust (Stewardship).',
     cluster:'governance'},
-  {id:'esg', label:"ESG\nFramework", short:'ESG', phase:1,
-    purpose:'Environmental, Social, and Governance criteria for evaluating organisational performance beyond financial returns.',
-    cluster:'measurement'},
-  {id:'bsc', label:"Balanced\nScorecard", short:'BSC', phase:1,
-    purpose:'Measures performance across four perspectives: Financial, Customer, Internal Process, Learning & Growth — preventing over-reliance on financial metrics alone.',
-    cluster:'measurement'},
-  {id:'shareholder', label:"Shareholder Primacy\nvs. Stakeholder\nCapitalism", short:'Shareholder vs Stakeholder', phase:1,
+  {id:'shareholder', label:"Shareholder Primacy\nvs. Stakeholder\nCapitalism", short:'Shareholder vs Stakeholder', stage:'context',
     purpose:'The fundamental governance debate: should organisations maximise shareholder value or serve broader stakeholder interests?',
     cluster:'governance'},
-  {id:'porter5', label:"Porter's\nFive Forces", short:"Porter's 5 Forces", phase:2,
-    purpose:'Analyses competitive intensity through five structural forces: rivalry, new entrants, substitutes, buyer power, supplier power.',
-    cluster:'external'},
-  {id:'pestle', label:"PESTLE\nAnalysis", short:'PESTLE', phase:2,
-    purpose:'Scans the macro-environment across Political, Economic, Social, Technological, Legal, and Environmental dimensions.',
-    cluster:'external'},
-  {id:'swot', label:"SWOT &\nTOWS", short:'SWOT/TOWS', phase:2,
-    purpose:'Maps internal Strengths/Weaknesses against external Opportunities/Threats. TOWS generates strategic options from the combinations.',
-    cluster:'synthesis'},
-  {id:'ansoff', label:"Ansoff\nGrowth Matrix", short:'Ansoff', phase:2,
-    purpose:'Maps four growth strategies based on market/product novelty: penetration, development, diversification — each with different risk profiles.',
-    cluster:'strategy'},
-  {id:'valuechain', label:"Porter's\nValue Chain", short:'Value Chain', phase:2,
-    purpose:'Breaks the organisation into primary and support activities to identify where value is created and where costs can be optimised.',
-    cluster:'internal'},
-  {id:'saf', label:"SAF\nFramework", short:'SAF', phase:2,
-    purpose:'Evaluates strategic options against three criteria: Suitability (does it fit?), Acceptability (to stakeholders?), Feasibility (can we do it?).',
-    cluster:'strategy'},
-  {id:'culturalweb', label:"Johnson's\nCultural Web", short:'Cultural Web', phase:3,
-    purpose:'Maps six cultural elements (stories, symbols, power structures, controls, rituals, organisation) around a central paradigm.',
-    cluster:'culture'},
-  {id:'csr', label:"Carroll's\nCSR Pyramid", short:'CSR Pyramid', phase:3,
+  {id:'csr', label:"Carroll's\nCSR Pyramid", short:'CSR Pyramid', stage:'context',
     purpose:'Layers corporate responsibility: Economic (be profitable) → Legal (obey law) → Ethical (do right) → Philanthropic (give back).',
     cluster:'governance'},
-  {id:'kotter', label:"Kotter's\n8-Step Change", short:'Kotter', phase:3,
-    purpose:'A sequential process for leading organisational change — from creating urgency through anchoring new approaches in culture.',
-    cluster:'change'},
-  {id:'scenario', label:"Scenario\nPlanning", short:'Scenario Planning', phase:3,
-    purpose:'Develops multiple plausible future scenarios to stress-test strategies against uncertainty rather than predict a single outcome.',
-    cluster:'external'},
-  {id:'schein', label:"Schein's\nCultural Model", short:'Schein', phase:3,
-    purpose:'Three layers of culture: visible Artifacts → stated Espoused Values → hidden Underlying Assumptions. Explains why culture is hard to change.',
-    cluster:'culture'},
-  {id:'mckinsey7s', label:"McKinsey\n7S", short:'7S', phase:3,
-    purpose:'Seven interdependent elements (Strategy, Structure, Systems, Shared Values, Style, Staff, Skills) that must align for effective execution.',
-    cluster:'internal'},
-  {id:'vrio', label:"VRIN/VRIO\nFramework", short:'VRIO', phase:4,
-    purpose:'Tests whether resources are Valuable, Rare, Inimitable, and Organised — determining if they provide sustained competitive advantage.',
-    cluster:'internal'},
-  {id:'tbl', label:"Triple\nBottom Line", short:'TBL', phase:4,
+  {id:'esg', label:"ESG\nFramework", short:'ESG', stage:'context',
+    purpose:'Environmental, Social, and Governance criteria for evaluating organisational performance beyond financial returns.',
+    cluster:'measurement'},
+  {id:'tbl', label:"Triple\nBottom Line", short:'TBL', stage:'context',
     purpose:'Measures organisational performance across three dimensions: Profit, People, Planet — arguing all three are essential.',
     cluster:'measurement'},
-  {id:'generic', label:"Porter's\nGeneric Strategies", short:'Generic Strategies', phase:2,
-    purpose:'Forces a commitment to one of four competitive postures — Cost Leadership, Differentiation, Cost Focus, Differentiation Focus — arguing that hedging between them produces a stuck-in-the-middle position vulnerable to every competitive force.',
-    cluster:'strategy'},
-  {id:'corecomp', label:"Hamel & Prahalad\nCore Competencies", short:'Core Competencies', phase:4,
+
+  // ── ANALYSIS — diagnose environment, resources, culture, futures ──
+  {id:'pestle', label:"PESTLE\nAnalysis", short:'PESTLE', stage:'analysis',
+    purpose:'Scans the macro-environment across Political, Economic, Social, Technological, Legal, and Environmental dimensions.',
+    cluster:'external'},
+  {id:'porter5', label:"Porter's\nFive Forces", short:"Porter's 5 Forces", stage:'analysis',
+    purpose:'Analyses competitive intensity through five structural forces: rivalry, new entrants, substitutes, buyer power, supplier power.',
+    cluster:'external'},
+  {id:'porterdiamond', label:"Porter's\nDiamond", short:"Porter's Diamond", stage:'analysis',
+    purpose:'Explains why some nations or regions become competitive in particular industries — Factor Conditions, Demand Conditions, Related & Supporting Industries, and Firm Strategy/Rivalry, with Government and Chance as influences.',
+    cluster:'external'},
+  {id:'scenario', label:"Scenario\nPlanning", short:'Scenario Planning', stage:'analysis',
+    purpose:'Develops multiple plausible future scenarios to stress-test strategies against uncertainty rather than predict a single outcome.',
+    cluster:'external'},
+  {id:'valuechain', label:"Porter's\nValue Chain", short:'Value Chain', stage:'analysis',
+    purpose:'Breaks the organisation into primary and support activities to identify where value is created and where costs can be optimised.',
+    cluster:'internal'},
+  {id:'vrio', label:"VRIN/VRIO\nFramework", short:'VRIO', stage:'analysis',
+    purpose:'Tests whether resources are Valuable, Rare, Inimitable, and Organised — determining if they provide sustained competitive advantage.',
+    cluster:'internal'},
+  {id:'corecomp', label:"Hamel & Prahalad\nCore Competencies", short:'Core Competencies', stage:'analysis',
     purpose:'Identifies recombinable bundles of skills and technologies that deliver disproportionate customer value — a collective, capability-based view of advantage that complements VRIO\'s single-resource test.',
     cluster:'internal'},
-  {id:'sixpaths', label:"Kim & Mauborgne\nSix Paths", short:'Six Paths', phase:2,
+  {id:'dynamiccaps', label:"Teece's\nDynamic Capabilities", short:'Dynamic Capabilities', stage:'analysis',
+    purpose:'Sensing, seizing, and reconfiguring — the higher-order capabilities that let an organisation deliberately renew its resource base as the environment shifts. Modern complement to the static resource-based view.',
+    cluster:'internal'},
+  {id:'culturalweb', label:"Johnson's\nCultural Web", short:'Cultural Web', stage:'analysis',
+    purpose:'Maps six cultural elements (stories, symbols, power structures, controls, rituals, organisation) around a central paradigm.',
+    cluster:'culture'},
+  {id:'schein', label:"Schein's\nCultural Model", short:'Schein', stage:'analysis',
+    purpose:'Three layers of culture: visible Artifacts → stated Espoused Values → hidden Underlying Assumptions. Explains why culture is hard to change.',
+    cluster:'culture'},
+
+  // ── SYNTHESIS — form the strategy: choices, options, models ──
+  {id:'swot', label:"SWOT &\nTOWS", short:'SWOT/TOWS', stage:'synthesis',
+    purpose:'Maps internal Strengths/Weaknesses against external Opportunities/Threats. TOWS generates strategic options from the combinations.',
+    cluster:'synthesis'},
+  {id:'saf', label:"SAF\nFramework", short:'SAF', stage:'synthesis',
+    purpose:'Evaluates strategic options against three criteria: Suitability (does it fit?), Acceptability (to stakeholders?), Feasibility (can we do it?).',
+    cluster:'strategy'},
+  {id:'ansoff', label:"Ansoff\nGrowth Matrix", short:'Ansoff', stage:'synthesis',
+    purpose:'Maps four growth strategies based on market/product novelty: penetration, development, diversification — each with different risk profiles.',
+    cluster:'strategy'},
+  {id:'bcg', label:"BCG\nGrowth-Share Matrix", short:'BCG Matrix', stage:'synthesis',
+    purpose:'Plots business units on relative market share and market growth — Stars, Cash Cows, Question Marks, Dogs — to allocate investment across a portfolio.',
+    cluster:'strategy'},
+  {id:'threehorizons', label:"McKinsey\nThree Horizons", short:'Three Horizons', stage:'synthesis',
+    purpose:'Balances near-term core (H1), emerging adjacencies (H2), and disruptive bets (H3) so that today\'s cash funds tomorrow\'s growth without starving either.',
+    cluster:'external'},
+  {id:'generic', label:"Porter's\nGeneric Strategies", short:'Generic Strategies', stage:'synthesis',
+    purpose:'Forces a commitment to one of four competitive postures — Cost Leadership, Differentiation, Cost Focus, Differentiation Focus — arguing that hedging between them produces a stuck-in-the-middle position vulnerable to every competitive force.',
+    cluster:'strategy'},
+  {id:'bowmansclock', label:"Bowman's\nStrategy Clock", short:"Bowman's Clock", stage:'synthesis',
+    purpose:'Eight competitive positions on price-versus-perceived-value axes — extending Porter\'s four generics with hybrid moves and explicit failure positions (low value/high price).',
+    cluster:'strategy'},
+  {id:'sixpaths', label:"Kim & Mauborgne\nSix Paths", short:'Six Paths', stage:'synthesis',
     purpose:'Six systematic routes across industry boundaries — alternative industries, strategic groups, buyer chain, complements, functional/emotional appeal, and time — used to find uncontested demand beyond current competition.',
     cluster:'external'},
-  {id:'canvas', label:"Strategy\nCanvas", short:'Strategy Canvas', phase:2,
+  {id:'canvas', label:"Strategy\nCanvas", short:'Strategy Canvas', stage:'synthesis',
     purpose:'Plots each competitor\'s value curve across the industry\'s standard competing factors, exposing where the industry has converged and where effort is being invested in factors buyers no longer reward.',
     cluster:'synthesis'},
-  {id:'fouractions', label:"Four Actions\nFramework (ERRC)", short:'Four Actions (ERRC)', phase:2,
+  {id:'fouractions', label:"Four Actions\nFramework (ERRC)", short:'Four Actions (ERRC)', stage:'synthesis',
     purpose:'Forces four questions — what to Eliminate, Reduce, Raise and Create — that collectively redraw the industry value curve, simultaneously lowering cost and lifting buyer value.',
     cluster:'strategy'},
-  {id:'blueocean', label:"Blue Ocean /\nValue Innovation", short:'Blue Ocean', phase:2,
+  {id:'blueocean', label:"Blue Ocean /\nValue Innovation", short:'Blue Ocean', stage:'synthesis',
     purpose:'Breaks the cost-versus-differentiation trade-off by creating uncontested market space where buyer value is lifted AND cost is reduced — making the competition irrelevant rather than trying to beat it.',
     cluster:'strategy'},
+  {id:'bmc', label:"Business Model\nCanvas", short:'Business Model Canvas', stage:'synthesis',
+    purpose:'Nine building blocks — segments, value propositions, channels, relationships, revenue, resources, activities, partners, costs — that together describe how an organisation creates, delivers, and captures value on a single page.',
+    cluster:'synthesis'},
+  {id:'mintzberg5ps', label:"Mintzberg's\n5 Ps for Strategy", short:'Mintzberg 5Ps', stage:'synthesis',
+    purpose:'Strategy as Plan, Ploy, Pattern, Position, and Perspective — exposes the deliberate-versus-emergent tension and warns that strategies form through action, not just through analysis.',
+    cluster:'synthesis'},
+
+  // ── IMPLEMENTATION — execute, measure, change ──
+  {id:'bsc', label:"Balanced\nScorecard", short:'BSC', stage:'implementation',
+    purpose:'Measures performance across four perspectives: Financial, Customer, Internal Process, Learning & Growth — preventing over-reliance on financial metrics alone.',
+    cluster:'measurement'},
+  {id:'okr', label:"Objectives &\nKey Results", short:'OKRs', stage:'implementation',
+    purpose:'Cascading Objectives (qualitative direction) paired with measurable Key Results, set quarterly and made transparent across the organisation — translates strategy into focused, time-boxed execution.',
+    cluster:'measurement'},
+  {id:'mckinsey7s', label:"McKinsey\n7S", short:'7S', stage:'implementation',
+    purpose:'Seven interdependent elements (Strategy, Structure, Systems, Shared Values, Style, Staff, Skills) that must align for effective execution.',
+    cluster:'internal'},
+  {id:'kotter', label:"Kotter's\n8-Step Change", short:'Kotter', stage:'implementation',
+    purpose:'A sequential process for leading organisational change — from creating urgency through anchoring new approaches in culture.',
+    cluster:'change'},
+  {id:'lewin', label:"Lewin's\nChange Model", short:"Lewin's Change", stage:'implementation',
+    purpose:'Three-stage change: Unfreeze (destabilise the existing equilibrium) → Change (move to a new state) → Refreeze (lock in the new equilibrium). The intellectual ancestor of most modern change models.',
+    cluster:'change'},
 ];
 
 const relationships = [
@@ -380,6 +419,63 @@ const relationships = [
   {source:'blueocean', target:'generic', type:'tension', label:'Blue Ocean rejects the Generic Strategies trade-off; argues low cost AND differentiation are simultaneously achievable'},
   {source:'blueocean', target:'porter5', type:'tension', label:'Blue Ocean aims to make the five forces irrelevant rather than navigate them'},
   {source:'blueocean', target:'ansoff', type:'synthesis', label:'Creating uncontested space is a distinct form of market/product diversification'},
+
+  // ── Stakeholder Salience (Mitchell, Agle & Wood) ──
+  {source:'freeman', target:'mitchell', type:'feeds', label:'Freeman identifies stakeholders; MAW adds salience attributes — power, legitimacy, urgency'},
+  {source:'mitchell', target:'mendelow', type:'synthesis', label:'Both prioritise stakeholders — Mendelow on power/interest, MAW on power/legitimacy/urgency'},
+  {source:'mitchell', target:'saf', type:'feeds', label:'Salience analysis sharpens Acceptability — exposes urgency and legitimacy, not just power'},
+
+  // ── Porter's Diamond ──
+  {source:'porterdiamond', target:'porter5', type:'synthesis', label:'Diamond explains the national context that shapes the five forces inside an industry'},
+  {source:'porterdiamond', target:'pestle', type:'synthesis', label:'Diamond complements PESTLE by structuring how national factor and demand conditions translate into competitive advantage'},
+  {source:'porterdiamond', target:'valuechain', type:'feeds', label:'National factor conditions shape which value-chain activities a firm can locate and develop competitively'},
+
+  // ── Dynamic Capabilities (Teece) ──
+  {source:'dynamiccaps', target:'vrio', type:'tension', label:'Dynamic Capabilities critiques VRIO\'s static snapshot — advantage comes from renewing resources, not just owning rare ones'},
+  {source:'dynamiccaps', target:'corecomp', type:'synthesis', label:'Both extend the resource-based view; Dynamic Capabilities adds the sensing-seizing-reconfiguring layer that lets competencies evolve'},
+  {source:'dynamiccaps', target:'scenario', type:'feeds', label:'Sensing capability is operationalised through scenario planning and structured futures work'},
+  {source:'dynamiccaps', target:'kotter', type:'synthesis', label:'Reconfiguring capability is the muscle that change programmes like Kotter\'s actually exercise'},
+
+  // ── BCG Growth-Share Matrix ──
+  {source:'bcg', target:'ansoff', type:'synthesis', label:'BCG describes the current portfolio; Ansoff prescribes the growth direction for each unit'},
+  {source:'bcg', target:'generic', type:'feeds', label:'BCG positions inform which generic posture fits each business unit (cost focus for cash cows, differentiation for stars)'},
+  {source:'bcg', target:'corecomp', type:'synthesis', label:'Stars and cash cows depend on whether the underlying core competencies still apply'},
+  {source:'bcg', target:'saf', type:'feeds', label:'Portfolio position constrains which strategic options pass Suitability and Feasibility for each unit'},
+
+  // ── Bowman's Strategy Clock ──
+  {source:'bowmansclock', target:'generic', type:'synthesis', label:'Bowman\'s eight positions extend Porter\'s four generics with hybrid moves and explicit failure positions'},
+  {source:'bowmansclock', target:'canvas', type:'synthesis', label:'Both visualise positioning — Clock on price/perceived-value axes, Canvas on industry competing factors'},
+  {source:'bowmansclock', target:'blueocean', type:'tension', label:'Bowman\'s Clock accepts the price/value trade-off; Blue Ocean rejects it'},
+
+  // ── Three Horizons (McKinsey) ──
+  {source:'threehorizons', target:'ansoff', type:'synthesis', label:'Both growth maps — Three Horizons adds a time/innovation dimension layered on top of Ansoff\'s product/market grid'},
+  {source:'threehorizons', target:'corecomp', type:'feeds', label:'Horizon 3 bets typically require deliberately building new core competencies'},
+  {source:'threehorizons', target:'scenario', type:'feeds', label:'Scenarios surface the futures that justify which Horizon 3 bets to make'},
+  {source:'threehorizons', target:'bmc', type:'feeds', label:'Each horizon often needs a distinct business model — H1 optimised, H3 newly designed'},
+  {source:'threehorizons', target:'dynamiccaps', type:'synthesis', label:'Three Horizons is the planning surface; Dynamic Capabilities is the organisational muscle that makes it executable'},
+
+  // ── Business Model Canvas (Osterwalder) ──
+  {source:'bmc', target:'valuechain', type:'synthesis', label:'BMC\'s Key Activities and Resources map onto Value Chain elements at a higher level of abstraction'},
+  {source:'bmc', target:'canvas', type:'synthesis', label:'Two one-page visual tools — BMC for the business model, Strategy Canvas for industry positioning'},
+  {source:'bmc', target:'blueocean', type:'feeds', label:'Blue Ocean moves usually require redesigning the business model, not just the offering'},
+  {source:'bmc', target:'freeman', type:'synthesis', label:'Customer Segments, Key Partners and Channels are stakeholder choices in BMC clothing'},
+
+  // ── Mintzberg 5Ps ──
+  {source:'mintzberg5ps', target:'generic', type:'tension', label:'5Ps\' "pattern" view critiques the deliberate, planned posture-choice that Generics implies'},
+  {source:'mintzberg5ps', target:'kotter', type:'synthesis', label:'Emergent strategy interacts with deliberate change programmes — both deliberate and emergent strategies need execution'},
+  {source:'mintzberg5ps', target:'swot', type:'tension', label:'5Ps challenges the deliberate analytical view that SWOT/TOWS represents — strategy emerges from action, not only analysis'},
+  {source:'mintzberg5ps', target:'culturalweb', type:'synthesis', label:'"Perspective" — the collective worldview — is exactly what the Cultural Web maps as the central paradigm'},
+
+  // ── Lewin's Change Model ──
+  {source:'lewin', target:'kotter', type:'synthesis', label:'Kotter\'s 8 steps operationalise Lewin\'s unfreeze–change–refreeze in concrete leadership behaviours'},
+  {source:'lewin', target:'schein', type:'feeds', label:'Lewin\'s field theory and psychological-safety thinking underpin Schein\'s work on cultural change'},
+  {source:'lewin', target:'mckinsey7s', type:'feeds', label:'Unfreezing requires destabilising the existing 7S configuration before a new one can settle'},
+
+  // ── OKRs ──
+  {source:'okr', target:'bsc', type:'synthesis', label:'Both performance management — OKRs more agile and quarterly, BSC more strategic and architectural'},
+  {source:'okr', target:'kotter', type:'feeds', label:'OKRs operationalise Kotter\'s "generate short-term wins" by making them visible, measurable and time-boxed'},
+  {source:'okr', target:'mckinsey7s', type:'synthesis', label:'OKRs translate the Strategy element of 7S into Systems and Shared Values that staff can act on'},
+  {source:'okr', target:'saf', type:'feeds', label:'OKRs are how SAF-approved options become operational targets'},
 ];
 
 // ── LAYOUT ──
@@ -387,16 +483,19 @@ const W = window.innerWidth, H = window.innerHeight;
 // Cluster centres spread wider now that several clusters carry more nodes
 // (strategy: 5, external: 4, internal: 4). Pushed corners outward and
 // separated strategy/internal on the right-hand side.
+// Bottom-corner legend boxes occupy roughly the lower 160px on the left
+// and right; cluster centres in those quadrants are pulled inward so the
+// initial layout starts clear of them.
 const clusterPositions = {
-  stakeholder: {cx: W*0.13, cy: H*0.24},
-  governance:  {cx: W*0.13, cy: H*0.68},
-  measurement: {cx: W*0.36, cy: H*0.80},
-  external:    {cx: W*0.46, cy: H*0.16},
-  synthesis:   {cx: W*0.48, cy: H*0.48},
-  strategy:    {cx: W*0.82, cy: H*0.34},
-  internal:    {cx: W*0.84, cy: H*0.74},
-  culture:     {cx: W*0.28, cy: H*0.44},
-  change:      {cx: W*0.62, cy: H*0.70},
+  stakeholder: {cx: W*0.13, cy: H*0.20},
+  governance:  {cx: W*0.13, cy: H*0.55},
+  measurement: {cx: W*0.36, cy: H*0.68},
+  external:    {cx: W*0.46, cy: H*0.14},
+  synthesis:   {cx: W*0.48, cy: H*0.44},
+  strategy:    {cx: W*0.80, cy: H*0.28},
+  internal:    {cx: W*0.80, cy: H*0.62},
+  culture:     {cx: W*0.28, cy: H*0.38},
+  change:      {cx: W*0.60, cy: H*0.58},
 };
 
 // Initial radial placement — larger base radius and steeper growth so a
@@ -411,7 +510,11 @@ frameworks.forEach(f => {
   f.x = c.cx + Math.cos(angle) * radius;
   f.y = c.cy + Math.sin(angle) * radius;
   f.x = Math.max(95, Math.min(W - 95, f.x));
-  f.y = Math.max(100, Math.min(H - 70, f.y));
+  f.y = Math.max(100, Math.min(H - 100, f.y));
+  // Keep initial seeds out of the bottom-corner legend zones too.
+  if (f.y > H - 230 && (f.x < 320 || f.x > W - 320)) {
+    f.y = H - 230;
+  }
 });
 
 function simulate(nodes, edges, iterations) {
@@ -466,7 +569,16 @@ function simulate(nodes, edges, iterations) {
     });
     nodes.forEach(n => {
       n.x = Math.max(100, Math.min(W - 100, n.x));
-      n.y = Math.max(100, Math.min(H - 80, n.y));
+      n.y = Math.max(100, Math.min(H - 100, n.y));
+      // Bottom-corner legend boxes occupy ~160px tall × ~260px wide.
+      // A node label extends ~70px below its centre, so to fully clear
+      // a legend the node centre must sit at least ~230px above the
+      // viewport bottom whenever it is in the left or right strip.
+      const legendKeepoutY = 230;
+      const cornerWidth = 320;
+      if (n.y > H - legendKeepoutY && (n.x < cornerWidth || n.x > W - cornerWidth)) {
+        n.y = H - legendKeepoutY;
+      }
     });
   }
 }
@@ -536,8 +648,8 @@ function render() {
   g.setAttribute('transform', `translate(${panX},${panY}) scale(${zoom})`);
   svg.appendChild(g);
 
-  const activePhases = currentFilter === 0 ? [1,2,3,4] : [currentFilter];
-  const activeIds = new Set(frameworks.filter(f => activePhases.includes(f.phase)).map(f => f.id));
+  const activeStages = currentFilter === 'all' ? stageOrder : [currentFilter];
+  const activeIds = new Set(frameworks.filter(f => activeStages.includes(f.stage)).map(f => f.id));
 
   const highlightIds = new Set();
   if (selectedNode) {
@@ -755,25 +867,25 @@ function render() {
 
     const glow = document.createElementNS('http://www.w3.org/2000/svg','circle');
     glow.setAttribute('r', 36);
-    glow.setAttribute('fill', phaseColors[f.phase]);
+    glow.setAttribute('fill', stageColors[f.stage]);
     glow.setAttribute('opacity', selectedNode === f.id ? 0.2 : 0.08);
     group.appendChild(glow);
 
     const circle = document.createElementNS('http://www.w3.org/2000/svg','circle');
     circle.setAttribute('r', 26);
     circle.setAttribute('fill', 'rgba(255,255,255,0.9)');
-    circle.setAttribute('stroke', phaseColors[f.phase]);
+    circle.setAttribute('stroke', stageColors[f.stage]);
     circle.setAttribute('stroke-width', selectedNode === f.id ? 2.5 : 1.5);
     group.appendChild(circle);
 
-    const phaseNum = document.createElementNS('http://www.w3.org/2000/svg','text');
-    phaseNum.setAttribute('text-anchor','middle');
-    phaseNum.setAttribute('dy','0.35em');
-    phaseNum.setAttribute('fill', phaseColors[f.phase]);
-    phaseNum.setAttribute('font-size','11');
-    phaseNum.setAttribute('font-weight','700');
-    phaseNum.textContent = f.phase;
-    group.appendChild(phaseNum);
+    const stageMark = document.createElementNS('http://www.w3.org/2000/svg','text');
+    stageMark.setAttribute('text-anchor','middle');
+    stageMark.setAttribute('dy','0.35em');
+    stageMark.setAttribute('fill', stageColors[f.stage]);
+    stageMark.setAttribute('font-size','11');
+    stageMark.setAttribute('font-weight','700');
+    stageMark.textContent = stageInitial[f.stage];
+    group.appendChild(stageMark);
 
     const lines = f.label.split('\n');
     lines.forEach((line, i) => {
@@ -794,7 +906,7 @@ function render() {
     if (connCount > 0) {
       const badge = document.createElementNS('http://www.w3.org/2000/svg','circle');
       badge.setAttribute('cx', 20); badge.setAttribute('cy', -18);
-      badge.setAttribute('r', 8); badge.setAttribute('fill', phaseColors[f.phase]);
+      badge.setAttribute('r', 8); badge.setAttribute('fill', stageColors[f.stage]);
       badge.setAttribute('opacity', 0.9);
       group.appendChild(badge);
       const badgeText = document.createElementNS('http://www.w3.org/2000/svg','text');
@@ -917,8 +1029,8 @@ function showTooltipNode(e, f) {
     });
   }
   tooltip.innerHTML = `
-    <div class="phase-badge" style="background:${phaseColors[f.phase]}30; color:${phaseColors[f.phase]}">${phaseNames[f.phase]}</div>
-    <h3 style="color:${phaseColors[f.phase]}">${f.label.replace(/\n/g,' ')}</h3>
+    <div class="phase-badge" style="background:${stageColors[f.stage]}30; color:${stageColors[f.stage]}">${stageNames[f.stage]}</div>
+    <h3 style="color:${stageColors[f.stage]}">${f.label.replace(/\n/g,' ')}</h3>
     <div class="purpose">${f.purpose}</div>
     ${connHtml}
   `;
@@ -950,16 +1062,17 @@ function positionTooltip(e) {
 
 function hideTooltip() { tooltip.style.display = 'none'; }
 
-function filterPhase(p) {
-  currentFilter = p;
+function filterStage(s) {
+  currentFilter = s;
   selectedNode = null;
+  const buttons = ['all', ...stageOrder];
   document.querySelectorAll('.ctrl-btn').forEach((btn, i) => {
-    btn.classList.toggle('active', i === p);
+    btn.classList.toggle('active', buttons[i] === s);
   });
   render();
 }
 
-filterPhase(0);
+filterStage('all');
 </script>
 </body>
 </html>
