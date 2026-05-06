@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Risk Management Framework Relationship Map</title>
+<title>Risk Management Framework Relationship Map — 2025/26 Edition</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
@@ -136,7 +136,7 @@
   <div class="header-divider"></div>
   <div class="header-text">
     <h1>Risk Management Framework Relationship Map</h1>
-    <p>CGQP Risk Management &mdash; How frameworks, standards and models interact</p>
+    <p>How risk frameworks, standards and resilience disciplines interact &mdash; 2025/26 edition</p>
   </div>
 </div>
 
@@ -179,7 +179,7 @@
 <script>
 // ── DATA ──
 const phaseColors = {1:'#5b8af5', 2:'#f59b42', 3:'#a66bf5', 4:'#42dba5'};
-const phaseNames = {1:'Phase 1 — Regulatory Foundations', 2:'Phase 2 — Concepts & Processes', 3:'Phase 3 — Assessment & Governance', 4:'Phase 4 — Control & Emerging'};
+const phaseNames = {1:'Phase 1 — Context & Environment', 2:'Phase 2 — Standards & Concepts', 3:'Phase 3 — Process, Assessment & Governance', 4:'Phase 4 — Response, Resilience & Reporting'};
 
 const relColors = {
   feeds:    '#4da6ff',
@@ -188,149 +188,199 @@ const relColors = {
 };
 
 const frameworks = [
-  // ── PHASE 1: Regulatory Foundations (Sessions 1-2, Chapters 1-4) ──
+  // ── PHASE 1: CONTEXT & ENVIRONMENT — the macro and regulatory landscape ──
   {id:'globalrisk', label:"Global Risk\nEnvironment", short:'Global Risk Environment', phase:1,
-    purpose:'The macro context of risks facing organisations globally — economic volatility, geopolitical shifts, pandemics, and climate change that shape the entire regulatory and risk landscape.',
-    cluster:'regulatory'},
+    purpose:'The macro context of risks facing organisations globally — economic volatility, geopolitical shifts, pandemics, supply-chain decoupling, and the climate transition. Sets the conditions every other framework operates inside.',
+    cluster:'environment'},
+  {id:'emerging', label:"Emerging Risks\n& Horizon Scanning", short:'Emerging Risks', phase:1,
+    purpose:'The methodology of horizon scanning and weak-signal detection. Distinct from any specific emerging risk (cyber, AI, climate are now their own nodes). Asks the structured question: what risks are not yet visible enough to be on the register but will be material within the planning horizon?',
+    cluster:'environment'},
   {id:'ukcgcode', label:"UK Corporate\nGovernance Code", short:'UK Corp Gov Code', phase:1,
-    purpose:'The UK\'s principles-based governance framework requiring boards to maintain sound risk management and internal control systems. Sets the "comply or explain" standard.',
+    purpose:'The UK\'s principles-based governance framework requiring boards to maintain sound risk management and internal control systems. Sets the "comply or explain" standard. Updated 2024 (effective Jan 2025) with strengthened internal-control declarations from FY2026.',
     cluster:'regulatory'},
   {id:'oecd', label:"OECD Principles\nof Corp Governance", short:'OECD Principles', phase:1,
-    purpose:'International benchmarks for corporate governance that inform national codes worldwide. Emphasise transparency, accountability, and the role of risk oversight at board level.',
-    cluster:'governance'},
-  {id:'iso31000', label:"ISO 31000:2018\nRisk Management", short:'ISO 31000', phase:1,
-    purpose:'The primary international standard for risk management. Provides principles, a framework and a process for managing risk that can be applied to any organisation regardless of size or sector.',
-    cluster:'standards'},
-  {id:'iso19600', label:"ISO 19600:2014\nCompliance Mgmt", short:'ISO 19600', phase:1,
-    purpose:'International standard providing guidelines for establishing, developing, implementing and improving a compliance management system within an organisation.',
-    cluster:'standards'},
+    purpose:'International benchmarks for corporate governance that inform national codes worldwide. Emphasise transparency, accountability, and the role of risk oversight at board level. Revised 2023 to strengthen sustainability and climate-related disclosures.',
+    cluster:'regulatory'},
   {id:'sectorreg', label:"Sector\nRegulators", short:'Sector Regulators', phase:1,
-    purpose:'Industry-specific regulatory bodies (FCA/PRA for financial services, HSE for health & safety, Environment Agency) that impose particular risk management requirements on organisations in their sectors.',
+    purpose:'Industry-specific regulators (FCA/PRA for financial services; HSE for health & safety; Environment Agency; ICO for data) that impose particular risk-management requirements on organisations in their sectors. The mechanism through which national policy turns into binding operational rules.',
     cluster:'regulatory'},
 
-  // ── PHASE 2: Risk Concepts & Processes (Sessions 3-4, Chapters 5-7) ──
+  // ── PHASE 2: STANDARDS & CONCEPTS — the formal frameworks and risk theory ──
+  {id:'iso31000', label:"ISO 31000:2018\nRisk Management", short:'ISO 31000', phase:2,
+    purpose:'The primary international standard for risk management. Provides principles, a framework and a process applicable to any organisation regardless of size or sector. Principles-based and high-level — it does not certify, it guides.',
+    cluster:'standards'},
+  {id:'coso_erm', label:"COSO ERM\n(2017)", short:'COSO ERM 2017', phase:2,
+    purpose:'COSO\'s Enterprise Risk Management framework — Aligning Risk with Strategy and Performance. The dominant US-anchored ERM standard, widely used by US-listed entities and any UK firm with US parent or audit exposure. Heavily emphasises the strategy-risk-appetite linkage that ISO 31000 treats more lightly.',
+    cluster:'standards'},
+  {id:'coso_ic', label:"COSO Internal\nControl (2013)", short:'COSO IC 2013', phase:2,
+    purpose:'COSO\'s Internal Control — Integrated Framework. The global gold standard for SOX compliance and (from FY2026) the UK\'s strengthened internal-control declarations under the 2024 Code. Five components: Control Environment, Risk Assessment, Control Activities, Information & Communication, Monitoring.',
+    cluster:'standards'},
+  {id:'iso37301', label:"ISO 37301:2021\nCompliance Mgmt", short:'ISO 37301', phase:2,
+    purpose:'The international standard for compliance management systems, replacing the withdrawn ISO 19600:2014. Unlike its predecessor, ISO 37301 is a Type A (certifiable) standard — organisations can be independently audited and certified against it. The shift from guidance to certifiable was deliberate: regulators wanted external assurance, not self-declaration.',
+    cluster:'standards'},
   {id:'riskdef', label:"Risk Definition\n& Categorisation", short:'Risk Categories', phase:2,
-    purpose:'How risk is defined (effect of uncertainty on objectives — ISO 31000) and categorised: pure vs speculative, fundamental vs particular, static vs dynamic, and by source (strategic, operational, financial, hazard).',
+    purpose:'How risk is defined (effect of uncertainty on objectives — ISO 31000) and categorised: pure vs speculative, fundamental vs particular, static vs dynamic, and by source (strategic, operational, financial, hazard, conduct, reputation).',
     cluster:'concepts'},
   {id:'interconnect', label:"Risk\nInterconnectivity", short:'Risk Interconnectivity', phase:2,
-    purpose:'The principle that risks do not exist in isolation — they interact, amplify, and cascade. One risk event can trigger or worsen others, making enterprise-wide thinking essential.',
+    purpose:'The principle that risks do not exist in isolation — they interact, amplify, and cascade. One risk event can trigger or worsen others. The conceptual basis for enterprise-wide rather than siloed risk management.',
     cluster:'concepts'},
   {id:'perception', label:"Risk\nPerception", short:'Risk Perception', phase:2,
-    purpose:'How individuals and organisations perceive risk is subjective and influenced by cognitive biases, cultural factors, and experience. This shapes decision-making and risk appetite in practice.',
+    purpose:'How individuals and organisations perceive risk is subjective and influenced by cognitive biases, cultural factors, and experience. Shapes decision-making and risk appetite in practice — what the board "feels" risky may not match what the data says is risky.',
     cluster:'concepts'},
-  {id:'erm', label:"Enterprise Risk\nManagement (ERM)", short:'ERM', phase:2,
-    purpose:'A holistic, organisation-wide approach to risk management that considers the portfolio of risks across all functions, moving beyond siloed risk management to create integrated oversight.',
-    cluster:'process'},
-  {id:'rmprocess', label:"Standard RM\nProcess", short:'RM Process', phase:2,
-    purpose:'The core risk management process from ISO 31000: Scope & Context → Risk Identification → Risk Analysis → Risk Evaluation → Risk Treatment, with Communication & Consultation and Monitoring & Review throughout.',
-    cluster:'process'},
-  {id:'threelines', label:"Three Lines\nModel", short:'Three Lines', phase:2,
-    purpose:'The governance model assigning risk responsibilities: 1st line (operational management owns risk), 2nd line (risk & compliance functions oversee), 3rd line (internal audit provides independent assurance).',
-    cluster:'process'},
 
-  // ── PHASE 3: Assessment & Governance (Sessions 5-7, Chapters 8-11) ──
+  // ── PHASE 3: PROCESS, ASSESSMENT & GOVERNANCE — operationalising risk management ──
+  {id:'erm', label:"Enterprise Risk\nManagement", short:'ERM', phase:3,
+    purpose:'A holistic, organisation-wide approach to risk management that considers the portfolio of risks across all functions, moving beyond siloed risk management to create integrated oversight. Operationalises both ISO 31000 and COSO ERM at firm level.',
+    cluster:'process'},
+  {id:'rmprocess', label:"Standard RM\nProcess", short:'RM Process', phase:3,
+    purpose:'The core risk-management process from ISO 31000: Scope & Context → Risk Identification → Risk Analysis → Risk Evaluation → Risk Treatment, with Communication & Consultation and Monitoring & Review throughout.',
+    cluster:'process'},
+  {id:'threelines', label:"Three Lines\nModel (2020)", short:'Three Lines Model', phase:3,
+    purpose:'The IIA\'s governance model assigning risk responsibilities: 1st line (operational management owns risk), 2nd line (risk & compliance functions oversee), 3rd line (internal audit provides independent assurance). Renamed from "Three Lines of Defence" in 2020 to emphasise value creation, not just protection.',
+    cluster:'process'},
   {id:'grc', label:"GRC\nFramework", short:'GRC Framework', phase:3,
     purpose:'The integrated framework combining Governance, Risk management and Compliance. Breaks down silos to ensure these three functions work together coherently rather than in isolation.',
     cluster:'governance'},
   {id:'riskid', label:"Risk Identification\nTechniques", short:'Risk Identification', phase:3,
-    purpose:'Methods for systematically finding and describing risks: HAZOP, fault tree analysis, bow-tie analysis, brainstorming, checklists, scenario analysis, and PESTLE analysis applied to risk.',
+    purpose:'Methods for systematically finding and describing risks: HAZOP, fault tree analysis, bow-tie analysis, brainstorming, checklists, scenario analysis, PESTLE applied to risk, and structured peer challenge.',
     cluster:'assessment'},
   {id:'riskassess', label:"Risk Assessment\n(Likelihood × Impact)", short:'Risk Assessment', phase:3,
-    purpose:'The process of analysing and evaluating identified risks using qualitative (heat maps, matrices) and quantitative (statistical, Monte Carlo) techniques to prioritise treatment.',
-    cluster:'assessment'},
-  {id:'riskreg', label:"Risk Registers\n& RCSA", short:'Risk Registers', phase:3,
-    purpose:'The documentary tools that capture, record and track risks: Risk Registers log risks with owners, controls and status; Risk & Control Self-Assessments (RCSA) engage business units in evaluating their own risks.',
+    purpose:'The process of analysing and evaluating identified risks using qualitative (heat maps, matrices, RAG) and quantitative (statistical, Monte Carlo, value-at-risk) techniques to prioritise treatment.',
     cluster:'assessment'},
   {id:'appetite', label:"Risk Appetite\n& Tolerance", short:'Risk Appetite', phase:3,
-    purpose:'Risk appetite is the amount and type of risk an organisation is willing to pursue or retain. Tolerance is the acceptable variation. Capacity is the maximum risk the organisation can absorb before failure.',
+    purpose:'Risk appetite is the amount and type of risk an organisation is willing to pursue or retain. Tolerance is the acceptable variation. Capacity is the maximum risk the organisation can absorb before failure. The board\'s primary quantitative anchor on the risk-strategy linkage.',
     cluster:'culture'},
   {id:'riskculture', label:"Risk\nCulture", short:'Risk Culture', phase:3,
-    purpose:'The shared values, beliefs, knowledge and attitudes toward risk within an organisation. A strong risk culture means risk-aware behaviour is embedded at every level, not just in policies.',
+    purpose:'The shared values, beliefs, knowledge and attitudes toward risk within an organisation. A strong risk culture means risk-aware behaviour is embedded at every level, not just in policies. The "tone from the top" combined with the "echo from the bottom".',
     cluster:'culture'},
   {id:'compliance', label:"Compliance\nManagement", short:'Compliance Mgmt', phase:3,
-    purpose:'The systematic approach to ensuring an organisation meets its legal, regulatory and ethical obligations. Includes compliance monitoring, testing, reporting and the role of the compliance function.',
+    purpose:'The systematic approach to ensuring an organisation meets its legal, regulatory and ethical obligations. Includes compliance monitoring, testing, reporting, and the role of the compliance function under the Three Lines Model.',
     cluster:'governance'},
 
-  // ── PHASE 4: Control & Emerging (Sessions 8-10, Chapters 12-15) ──
+  // ── PHASE 4: RESPONSE, RESILIENCE & REPORTING — controls, resilience disciplines and disclosure ──
+  {id:'riskreg', label:"Risk Registers\n& RCSA", short:'Risk Registers', phase:4,
+    purpose:'The documentary tools that capture, record and track risks: Risk Registers log risks with owners, controls and status; Risk & Control Self-Assessments (RCSA) engage business units in evaluating their own risks. The shared reporting language between governance, risk and compliance.',
+    cluster:'reporting'},
   {id:'fivets', label:"Five Ts of\nRisk Control", short:'Five Ts', phase:4,
-    purpose:'The five strategic responses to risk: Treat (reduce likelihood/impact), Tolerate (accept within appetite), Transfer (insurance, outsourcing), Terminate (avoid the activity), Take the opportunity (exploit upside risk).',
+    purpose:'The strategic responses to risk. The traditional UK pedagogy is "4 Ts" — Treat (reduce likelihood/impact), Tolerate (accept within appetite), Transfer (insurance, outsourcing), Terminate (avoid the activity). The "5th T" — Take the opportunity (exploit upside risk) — aligns with ISO 31000\'s definition of risk as bidirectional.',
     cluster:'control'},
   {id:'treatment', label:"Risk Treatment\n& Controls", short:'Risk Treatment', phase:4,
-    purpose:'The specific controls and measures implemented to modify risk: preventive controls (stop it happening), detective controls (find it quickly), corrective controls (fix it), and directive controls (guide behaviour).',
+    purpose:'The specific controls and measures implemented to modify risk: preventive controls (stop it happening), detective controls (find it quickly), corrective controls (fix it), and directive controls (guide behaviour). The operational layer where COSO Internal Control is most directly applied.',
     cluster:'control'},
   {id:'financing', label:"Risk\nFinancing", short:'Risk Financing', phase:4,
-    purpose:'How organisations fund risk losses: insurance (transfer), self-insurance (retention), captive insurance companies, and alternative risk transfer mechanisms like catastrophe bonds.',
+    purpose:'How organisations fund risk losses: insurance (transfer), self-insurance (retention), captive insurance companies, and alternative risk-transfer mechanisms like catastrophe bonds. Heavily regulated in financial services through Solvency II / Basel capital frameworks.',
     cluster:'control'},
   {id:'bcp', label:"Business Continuity\n& Crisis Mgmt", short:'BCP/Crisis Mgmt', phase:4,
-    purpose:'Planning for and responding to major disruptions: Business Continuity Plans maintain critical functions during crises; Crisis Management coordinates the immediate response to major incidents.',
-    cluster:'application'},
-  {id:'csr', label:"CSR &\nSustainability", short:'CSR/Sustainability', phase:4,
-    purpose:'Corporate Social Responsibility and sustainability as a risk management lens — organisations must manage environmental, social and governance risks to maintain their licence to operate and long-term viability.',
-    cluster:'application'},
-  {id:'emerging', label:"Emerging Risks\n& Digital", short:'Emerging Risks', phase:4,
-    purpose:'New and evolving risks including cyber threats, digital transformation, AI, climate change, financial crime, bribery & corruption, and the increasing interconnectedness and complexity of the global risk landscape.',
-    cluster:'application'},
+    purpose:'Planning for and responding to major disruptions: Business Continuity Plans maintain critical functions during crises; Crisis Management coordinates the immediate response to major incidents. Now a subset of the broader Operational Resilience discipline in regulated sectors.',
+    cluster:'resilience'},
+  {id:'iso22301', label:"ISO 22301:2019\nBusiness Continuity", short:'ISO 22301', phase:4,
+    purpose:'The international standard for business continuity management systems. A Type A (certifiable) standard establishing the requirements for planning, implementing, operating, monitoring, reviewing and improving a documented BCMS. The methodological backbone underneath BCP/Crisis Mgmt.',
+    cluster:'resilience'},
+  {id:'opres', label:"Operational\nResilience", short:'Operational Resilience', phase:4,
+    purpose:'A broader regulatory discipline that has effectively superseded BCP in regulated sectors. UK PRA SS1/21, FCA PS21/3 (in force 2025), and the EU DORA regulation (in force Jan 2025) require firms to identify Important Business Services, set Impact Tolerances, and demonstrate ability to deliver within those tolerances during severe-but-plausible disruption. The question shifts from "can we recover?" to "can we keep operating?".',
+    cluster:'resilience'},
+  {id:'esg', label:"ESG &amp; Climate\nDisclosures", short:'ESG &amp; Climate', phase:4,
+    purpose:'The mandatory disclosure regime around environmental, social and governance risk. TCFD (now absorbed into IFRS S1 & S2 / ISSB), the UK Transition Plan Taskforce (TPT), CSRD and SFDR in the EU. No longer a "CSR" or sustainability initiative — a hard financial-reporting and governance requirement enforced by securities regulators.',
+    cluster:'reporting'},
+  {id:'cyber', label:"Cyber Risk\n(ISO 27001 / NIST CSF)", short:'Cyber', phase:4,
+    purpose:'Cyber risk treated as a permanent operational-and-strategic risk discipline, not an "emerging" topic. ISO 27001:2022 provides the certifiable Information Security Management System; NIST CSF 2.0 (2024) provides the widely-adopted control framework structured around Identify, Protect, Detect, Respond, Recover plus the new Govern function.',
+    cluster:'resilience'},
+  {id:'ai_gov', label:"AI Governance\n(EU AI Act / NIST AI RMF)", short:'AI Governance', phase:4,
+    purpose:'The governance discipline around AI risk. The EU AI Act (in force 2024–26) classifies AI systems by risk tier (unacceptable, high, limited, minimal) with binding obligations for each. NIST AI RMF (2023) provides a risk-management framework usable in any jurisdiction. Boards and audit committees are building AI acceptable-use policies and oversight structures around these.',
+    cluster:'reporting'},
+  {id:'tprm', label:"Third-Party\nRisk Management", short:'TPRM', phase:4,
+    purpose:'The discipline of managing risk from suppliers, vendors, outsourced cloud providers and the wider supply chain. Sharply elevated post-COVID and amid geopolitical decoupling. Sector regulators increasingly mandate concentration-risk monitoring, exit-plan testing, and contractual rights for cyber, BCM and operational-resilience evidence from critical third parties.',
+    cluster:'resilience'},
 ];
 
 const relationships = [
-  // ── REGULATORY FOUNDATIONS → Everything ──
-  {source:'globalrisk', target:'sectorreg', type:'feeds', label:'The evolving global risk landscape drives sector regulators to create and update risk management requirements'},
-  {source:'globalrisk', target:'emerging', type:'feeds', label:'Global trends (climate, digital, geopolitical) directly create emerging risk categories that organisations must address'},
+  // ── PHASE 1 → REST: Context & Environment radiates outwards ──
+  {source:'globalrisk', target:'sectorreg', type:'feeds', label:'The evolving global risk landscape drives sector regulators to create and update risk-management requirements'},
   {source:'globalrisk', target:'iso31000', type:'feeds', label:'The need for systematic risk management in a complex global environment drove the creation of ISO 31000'},
+  {source:'globalrisk', target:'esg', type:'feeds', label:'Climate transition, geopolitics and supply-chain decoupling are the global-risk pressures that turned ESG into a hard regulatory disclosure regime'},
+  {source:'emerging', target:'riskid', type:'feeds', label:'Emerging-risk methodology demands new identification techniques — traditional checklists miss novel threats; horizon-scanning and weak-signal analysis become primary'},
+  {source:'emerging', target:'cyber', type:'synthesis', label:'Cyber graduated from "emerging" to a permanent risk discipline; the methodology of horizon scanning is what surfaced the threat ahead of widespread board awareness'},
+  {source:'emerging', target:'ai_gov', type:'synthesis', label:'AI governance is a 2023–25 graduate from emerging-risk horizon-scanning into binding regulation (EU AI Act, NIST AI RMF)'},
   {source:'oecd', target:'ukcgcode', type:'feeds', label:'OECD international governance principles inform and influence national governance codes including the UK\'s'},
-  {source:'oecd', target:'grc', type:'feeds', label:'OECD principles on transparency and accountability inform the governance component of GRC frameworks'},
+  {source:'oecd', target:'esg', type:'feeds', label:'OECD\'s 2023 revision of the Principles strengthened sustainability and climate-related disclosure expectations, accelerating IFRS S1/S2 adoption'},
   {source:'ukcgcode', target:'grc', type:'feeds', label:'The UK Corporate Governance Code requires boards to maintain governance structures that GRC frameworks operationalise'},
-  {source:'ukcgcode', target:'threelines', type:'feeds', label:'Corporate governance requirements drive the need for clear risk accountability structures like the Three Lines Model'},
+  {source:'ukcgcode', target:'threelines', type:'feeds', label:'Corporate-governance requirements drive the need for clear risk accountability structures like the Three Lines Model'},
+  {source:'ukcgcode', target:'appetite', type:'feeds', label:'The 2024 UK Corp Gov Code requires boards to set risk appetite and ensure it is communicated throughout the organisation'},
+  {source:'ukcgcode', target:'appetite', type:'tension', label:'Strategy ambition vs risk appetite — boards routinely find their declared appetite cannot accommodate the strategy they signed off; one must adjust'},
+  {source:'ukcgcode', target:'coso_ic', type:'feeds', label:'The 2024 Code\'s strengthened internal-control declaration (effective FY2026) has made COSO Internal Control the working framework most UK-listed boards adopt'},
   {source:'sectorreg', target:'compliance', type:'feeds', label:'Sector-specific regulations create the compliance obligations that compliance management systems must address'},
-  {source:'iso31000', target:'rmprocess', type:'feeds', label:'ISO 31000 defines the standard risk management process that organisations follow: identify, analyse, evaluate, treat'},
+  {source:'sectorreg', target:'opres', type:'feeds', label:'UK PRA SS1/21, FCA PS21/3 and EU DORA are sector-regulator interventions that mandate Operational Resilience for regulated firms'},
+  {source:'sectorreg', target:'financing', type:'feeds', label:'Sector regulators (especially financial services) mandate minimum capital requirements and insurance via Solvency II / Basel — driving risk-financing decisions'},
+
+  // ── STANDARDS layer ──
+  {source:'iso31000', target:'rmprocess', type:'feeds', label:'ISO 31000 defines the standard risk-management process organisations follow: identify, analyse, evaluate, treat'},
   {source:'iso31000', target:'erm', type:'feeds', label:'ISO 31000 provides the foundational framework upon which enterprise-wide risk management is built'},
   {source:'iso31000', target:'riskassess', type:'feeds', label:'ISO 31000\'s process framework mandates systematic risk assessment as a core step'},
-  {source:'iso19600', target:'compliance', type:'feeds', label:'ISO 19600 provides the international standard and guidelines for designing compliance management systems'},
+  {source:'iso31000', target:'appetite', type:'feeds', label:'ISO 31000 requires organisations to define risk criteria including risk appetite as part of establishing the context'},
+  {source:'iso31000', target:'riskreg', type:'feeds', label:'ISO 31000 requires documentation and reporting of risks — risk registers are the primary tool'},
+  {source:'coso_erm', target:'erm', type:'feeds', label:'COSO ERM (2017) is the framework most US-anchored organisations use to define what "enterprise risk management" actually means in practice'},
+  {source:'coso_erm', target:'iso31000', type:'tension', label:'COSO ERM and ISO 31000 are parallel frameworks with different emphases — COSO foregrounds strategy and performance; ISO 31000 foregrounds principles and process. Most large firms reconcile both rather than choose between them'},
+  {source:'coso_erm', target:'appetite', type:'feeds', label:'COSO ERM (2017) heavily emphasises the strategy-risk-appetite linkage as a governance discipline distinct from operational risk taxonomy'},
+  {source:'coso_ic', target:'treatment', type:'feeds', label:'COSO Internal Control specifies the control activities (preventive, detective, corrective, directive) through which risk treatment is operationalised'},
+  {source:'coso_ic', target:'compliance', type:'feeds', label:'COSO Internal Control underpins the SOX / UK-SOX compliance regime — the framework regulators expect when assessing the quality of internal-control declarations'},
+  {source:'coso_ic', target:'riskassess', type:'feeds', label:'Risk Assessment is one of COSO Internal Control\'s five components, embedded in the framework rather than a separate exercise'},
+  {source:'iso37301', target:'compliance', type:'feeds', label:'ISO 37301:2021 provides the certifiable standard for compliance management systems, replacing the withdrawn ISO 19600:2014. Type A certification is the change that matters — regulators now expect external assurance'},
+  {source:'iso37301', target:'riskreg', type:'synthesis', label:'Compliance obligations register on the same risk register as operational and strategic risks, requiring integrated reporting under GRC'},
 
-  // ── CONCEPTS & PROCESSES ──
+  // ── CONCEPTS → PROCESS ──
   {source:'riskdef', target:'riskassess', type:'feeds', label:'How risk is defined and categorised determines the assessment approach — different risk types require different analytical methods'},
-  {source:'riskdef', target:'interconnect', type:'synthesis', label:'Risk categories reveal connections between risks — a strategic risk can cascade into operational and financial risks'},
+  {source:'riskdef', target:'interconnect', type:'synthesis', label:'Risk categories reveal connections between risks — a strategic risk can cascade into operational, conduct, reputational and financial risks'},
+  {source:'riskdef', target:'appetite', type:'feeds', label:'Risk categorisation (pure vs speculative, upside vs downside) determines how appetite is expressed for different risk types'},
   {source:'interconnect', target:'erm', type:'feeds', label:'The recognition that risks are interconnected drives the need for an enterprise-wide rather than siloed approach'},
-  {source:'interconnect', target:'emerging', type:'synthesis', label:'Emerging risks create new interconnections; digital transformation, for instance, links cyber risk to operational, reputational and strategic risks'},
+  {source:'interconnect', target:'tprm', type:'synthesis', label:'Third-party risk is the canonical interconnectivity case — a single supplier failure cascades into operational, financial, reputational and regulatory risk simultaneously'},
   {source:'perception', target:'riskculture', type:'synthesis', label:'Individual risk perceptions collectively form organisational risk culture — how people perceive risk shapes how the organisation behaves'},
   {source:'perception', target:'appetite', type:'feeds', label:'Cognitive biases and subjective perception influence how risk appetite is set and interpreted at different organisational levels'},
+
+  // ── PROCESS, ASSESSMENT & GOVERNANCE ──
   {source:'erm', target:'grc', type:'synthesis', label:'ERM is the "R" in GRC — enterprise risk management must integrate with governance structures and compliance functions'},
   {source:'erm', target:'riskculture', type:'synthesis', label:'ERM requires a strong risk culture to succeed — without risk-aware behaviour, enterprise frameworks remain paper exercises'},
-  {source:'rmprocess', target:'riskid', type:'feeds', label:'The standard risk management process begins with systematic risk identification as its first operational step'},
+  {source:'rmprocess', target:'riskid', type:'feeds', label:'The standard risk-management process begins with systematic risk identification as its first operational step'},
+  {source:'rmprocess', target:'fivets', type:'feeds', label:'The final step of the RM process — risk treatment — is operationalised through the Five Ts framework'},
   {source:'threelines', target:'erm', type:'feeds', label:'The Three Lines Model provides the accountability structure that makes enterprise-wide risk management operational'},
   {source:'threelines', target:'compliance', type:'feeds', label:'The Three Lines Model assigns compliance to the 2nd line, providing oversight and challenge to 1st line risk-taking'},
-
-  // ── ASSESSMENT & GOVERNANCE ──
+  {source:'threelines', target:'riskculture', type:'tension', label:'The intrinsic 1st-line vs 2nd-line tension — revenue-driven 1st line vs control-driven 2nd line — is one of the most consequential frictions in any risk culture, and one boards routinely under-manage'},
   {source:'riskid', target:'riskassess', type:'feeds', label:'Identified risks flow into assessment — you must find risks before you can analyse their likelihood and impact'},
   {source:'riskassess', target:'riskreg', type:'feeds', label:'Assessment outputs (risk ratings, priorities, owners) populate risk registers for ongoing tracking and reporting'},
-  {source:'riskreg', target:'fivets', type:'feeds', label:'Risk registers identify which risks exceed tolerance, feeding directly into decisions about which of the Five Ts to apply'},
   {source:'appetite', target:'riskassess', type:'synthesis', label:'Risk appetite sets the criteria against which assessed risks are evaluated — determining what is acceptable and what requires treatment'},
-  {source:'appetite', target:'fivets', type:'feeds', label:'Risk appetite thresholds determine control responses: risks within appetite may be tolerated; those exceeding it must be treated, transferred or terminated'},
-  {source:'riskculture', target:'appetite', type:'tension', label:'Formal risk appetite statements may conflict with actual cultural attitudes to risk — the "tone from the top" vs reality on the ground'},
+  {source:'appetite', target:'fivets', type:'feeds', label:'Risk-appetite thresholds determine control responses: risks within appetite may be tolerated; those exceeding it must be treated, transferred or terminated'},
+  {source:'riskculture', target:'appetite', type:'tension', label:'Formal risk-appetite statements may conflict with actual cultural attitudes to risk — the "tone from the top" vs reality on the ground'},
   {source:'riskculture', target:'compliance', type:'synthesis', label:'A strong risk culture supports compliance by making ethical and risk-aware behaviour intrinsic rather than purely rule-based'},
-  {source:'grc', target:'compliance', type:'feeds', label:'GRC frameworks integrate compliance into the broader governance and risk management architecture'},
+  {source:'grc', target:'compliance', type:'feeds', label:'GRC frameworks integrate compliance into the broader governance and risk-management architecture'},
   {source:'grc', target:'riskreg', type:'synthesis', label:'GRC requires consolidated risk reporting — risk registers become the shared language between governance, risk and compliance functions'},
   {source:'compliance', target:'sectorreg', type:'synthesis', label:'Compliance management must continuously adapt as sector regulatory requirements evolve'},
 
-  // ── CONTROL & EMERGING ──
-  {source:'fivets', target:'treatment', type:'feeds', label:'The Five Ts strategic decision guides selection of specific risk treatment controls: preventive, detective, corrective and directive'},
-  {source:'fivets', target:'financing', type:'feeds', label:'The "Transfer" T directly drives risk financing decisions — insurance, captives and alternative risk transfer mechanisms'},
-  {source:'treatment', target:'bcp', type:'feeds', label:'Risk treatments include business continuity and crisis management plans for major loss scenarios'},
+  // ── RESPONSE, RESILIENCE & REPORTING ──
+  {source:'fivets', target:'treatment', type:'feeds', label:'The Five Ts strategic decision guides selection of specific risk-treatment controls: preventive, detective, corrective and directive'},
+  {source:'fivets', target:'financing', type:'feeds', label:'The "Transfer" T directly drives risk-financing decisions — insurance, captives and alternative risk-transfer mechanisms'},
+  {source:'riskreg', target:'fivets', type:'feeds', label:'Risk registers identify which risks exceed tolerance, feeding directly into decisions about which of the Five Ts to apply'},
+  {source:'treatment', target:'bcp', type:'feeds', label:'Risk treatments include business-continuity and crisis-management plans for major loss scenarios'},
   {source:'financing', target:'bcp', type:'synthesis', label:'Risk financing and BCP work together — continuity planning determines what must be protected; financing provides the resources'},
-  {source:'csr', target:'globalrisk', type:'synthesis', label:'CSR and sustainability both respond to and shape the global risk environment — climate commitments reduce long-term environmental risk'},
-  {source:'csr', target:'riskculture', type:'synthesis', label:'An organisation\'s commitment to CSR reflects and reinforces its risk culture — both require ethical awareness and long-term thinking'},
-  {source:'emerging', target:'riskid', type:'feeds', label:'Emerging risks require new and adapted identification methods — traditional techniques may miss novel threats like AI risk or cyber threats'},
-  {source:'emerging', target:'treatment', type:'tension', label:'Emerging risks challenge existing controls — digital transformation creates risks that traditional treatment approaches may not adequately address'},
-  {source:'emerging', target:'bcp', type:'feeds', label:'New threat types (cyber attacks, pandemics, climate events) require updated business continuity and crisis management scenarios'},
-  {source:'bcp', target:'erm', type:'synthesis', label:'Business continuity and crisis management are critical components of enterprise risk management — the response when controls fail'},
+  {source:'iso22301', target:'bcp', type:'feeds', label:'ISO 22301:2019 provides the certifiable BCMS standard that underpins formal business-continuity programmes'},
+  {source:'iso22301', target:'opres', type:'synthesis', label:'ISO 22301 is the certifiable standard underneath the broader Operational Resilience discipline — necessary but not sufficient'},
+  {source:'opres', target:'bcp', type:'synthesis', label:'Operational Resilience supersedes traditional BCP in regulated sectors — BCP becomes a subset of a broader programme that includes impact tolerances, severe-but-plausible scenarios and Important Business Service mapping'},
+  {source:'opres', target:'tprm', type:'synthesis', label:'Operational Resilience requires deep visibility into the third-party chain — TPRM is one of OpRes\'s primary inputs and ongoing controls'},
+  {source:'opres', target:'cyber', type:'synthesis', label:'Operational Resilience and cyber risk converge in any digitally-delivered service — cyber control evidence is now a standard part of OpRes self-assessment'},
+  {source:'cyber', target:'emerging', type:'feeds', label:'Horizon-scanning identified cyber as systemic ahead of regulators; cyber is now the largest single category of risk-register additions in most large organisations'},
+  {source:'cyber', target:'tprm', type:'synthesis', label:'Third-party cyber risk is the dominant single source of cyber breaches in 2024–25 — supply-chain compromise via SolarWinds-style attacks made TPRM and cyber inseparable'},
+  {source:'cyber', target:'bcp', type:'feeds', label:'Cyber incidents (ransomware in particular) are now the most common BCP trigger in regulated sectors, restructuring how continuity plans are designed and tested'},
+  {source:'ai_gov', target:'compliance', type:'synthesis', label:'EU AI Act compliance is now part of compliance management systems for any firm offering services in the EU; the obligation has been folded into existing compliance programmes'},
+  {source:'ai_gov', target:'riskculture', type:'synthesis', label:'AI governance demands explicit risk-culture work — "acceptable use" policies only function if the culture supports cautious deployment over speed-to-market'},
+  {source:'tprm', target:'erm', type:'synthesis', label:'TPRM is now a permanent ERM domain alongside operational, financial and strategic risk — not a procurement function'},
+  {source:'tprm', target:'compliance', type:'synthesis', label:'Concentration risk, exit planning, and contractual right-to-audit have made TPRM a core compliance discipline in regulated sectors'},
+  {source:'esg', target:'globalrisk', type:'synthesis', label:'ESG disclosures both respond to and shape the global risk environment — climate transition commitments materially alter long-term environmental and litigation risk'},
+  {source:'esg', target:'riskculture', type:'synthesis', label:'ESG is now a culture indicator as much as a disclosure obligation — the gap between disclosed commitments and observed behaviour is one of the most-watched risk signals'},
+  {source:'esg', target:'ukcgcode', type:'feeds', label:'TCFD-aligned disclosures (now IFRS S1 & S2 via ISSB) and the UK Transition Plan Taskforce framework feed directly into the UK Corp Gov Code\'s risk and reporting expectations'},
+  {source:'esg', target:'riskreg', type:'feeds', label:'Climate-related and ESG risks now sit on the risk register alongside operational and financial risks — IFRS S2 mandates assessment, disclosure and treatment'},
 
-  // ── CROSS-PHASE CONNECTIONS ──
-  {source:'iso31000', target:'appetite', type:'feeds', label:'ISO 31000 requires organisations to define risk criteria including risk appetite as part of establishing the context'},
-  {source:'iso31000', target:'riskreg', type:'feeds', label:'ISO 31000 requires documentation and reporting of risks — risk registers are the primary tool for this'},
-  {source:'ukcgcode', target:'appetite', type:'feeds', label:'The UK Corporate Governance Code requires boards to set risk appetite and ensure it is communicated throughout the organisation'},
-  {source:'sectorreg', target:'financing', type:'feeds', label:'Sector regulators (especially in financial services) mandate minimum capital requirements and insurance — driving risk financing decisions'},
-  {source:'rmprocess', target:'fivets', type:'feeds', label:'The final step of the RM process — risk treatment — is operationalised through the Five Ts framework'},
-  {source:'riskdef', target:'appetite', type:'feeds', label:'Risk categorisation (pure vs speculative, upside vs downside) determines how appetite is expressed for different risk types'},
+  // ── INCIDENT FEEDBACK LOOPS ──
+  {source:'bcp', target:'erm', type:'synthesis', label:'Business continuity and crisis management are critical components of enterprise risk management — the response when controls fail'},
+  {source:'bcp', target:'riskreg', type:'feeds', label:'Incident debriefs and crisis post-mortems update the risk register — actual events refine likelihood and impact estimates that pre-event analysis can only approximate'},
+  {source:'bcp', target:'riskassess', type:'feeds', label:'Realised incidents feed back into risk assessment — actual control failures and near-misses are the most valuable inputs to recalibrating likelihood-impact ratings'},
 ];
 
 // ── LAYOUT ──
