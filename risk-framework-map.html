@@ -384,7 +384,8 @@ const relationships = [
 ];
 
 // ── LAYOUT ──
-const W = window.innerWidth, H = window.innerHeight;
+const W = Math.max(1400, window.innerWidth || document.documentElement.clientWidth || 1400);
+const H = Math.max(900,  window.innerHeight || document.documentElement.clientHeight || 900);
 const clusterPositions = {
   // Phase 1 — Context & Environment
   environment: {cx: W*0.10, cy: H*0.45},
