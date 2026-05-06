@@ -142,10 +142,10 @@
 
 <div id="controls">
   <button class="ctrl-btn active" onclick="filterPhase(0)">All</button>
-  <button class="ctrl-btn" onclick="filterPhase(1)">Regulatory</button>
-  <button class="ctrl-btn" onclick="filterPhase(2)">Concepts</button>
-  <button class="ctrl-btn" onclick="filterPhase(3)">Assessment</button>
-  <button class="ctrl-btn" onclick="filterPhase(4)">Control</button>
+  <button class="ctrl-btn" onclick="filterPhase(1)">Context</button>
+  <button class="ctrl-btn" onclick="filterPhase(2)">Standards</button>
+  <button class="ctrl-btn" onclick="filterPhase(3)">Process &amp; Governance</button>
+  <button class="ctrl-btn" onclick="filterPhase(4)">Resilience</button>
 </div>
 
 <svg id="canvas"></svg>
@@ -154,10 +154,10 @@
 
 <div id="legend">
   <h4>Phase</h4>
-  <div class="legend-item"><div class="legend-dot" style="background:#5b8af5"></div>Phase 1 &mdash; Regulatory Foundations</div>
-  <div class="legend-item"><div class="legend-dot" style="background:#f59b42"></div>Phase 2 &mdash; Concepts &amp; Processes</div>
-  <div class="legend-item"><div class="legend-dot" style="background:#a66bf5"></div>Phase 3 &mdash; Assessment &amp; Governance</div>
-  <div class="legend-item"><div class="legend-dot" style="background:#42dba5"></div>Phase 4 &mdash; Control &amp; Emerging</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#5b8af5"></div>Phase 1 &mdash; Context &amp; Environment</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#f59b42"></div>Phase 2 &mdash; Standards &amp; Concepts</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#a66bf5"></div>Phase 3 &mdash; Process, Assessment &amp; Governance</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#42dba5"></div>Phase 4 &mdash; Response, Resilience &amp; Reporting</div>
 </div>
 
 <div id="rel-legend">
@@ -386,14 +386,22 @@ const relationships = [
 // ── LAYOUT ──
 const W = window.innerWidth, H = window.innerHeight;
 const clusterPositions = {
+  // Phase 1 — Context & Environment
+  environment: {cx: W*0.10, cy: H*0.45},
   regulatory:  {cx: W*0.15, cy: H*0.25},
-  governance:  {cx: W*0.22, cy: H*0.55},
+  // Phase 2 — Standards & Concepts
   standards:   {cx: W*0.38, cy: H*0.22},
   concepts:    {cx: W*0.55, cy: H*0.20},
+  // Phase 3 — Process, Assessment & Governance
+  governance:  {cx: W*0.30, cy: H*0.50},
   process:     {cx: W*0.48, cy: H*0.45},
   assessment:  {cx: W*0.62, cy: H*0.42},
-  culture:     {cx: W*0.38, cy: H*0.65},
-  control:     {cx: W*0.72, cy: H*0.62},
+  culture:     {cx: W*0.40, cy: H*0.65},
+  // Phase 4 — Response, Resilience & Reporting
+  control:     {cx: W*0.72, cy: H*0.65},
+  resilience:  {cx: W*0.82, cy: H*0.52},
+  reporting:   {cx: W*0.86, cy: H*0.28},
+  // Legacy (no current frameworks use these)
   application: {cx: W*0.80, cy: H*0.35},
 };
 
